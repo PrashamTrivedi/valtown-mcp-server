@@ -17,7 +17,14 @@ export function registerFileTools(server: McpServer, config: Config) {
       limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of results to return"),
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
     },
-    async ({projectId, path, branchId, recursive, limit, offset}) => {
+    async ({projectId, path, branchId, recursive, limit, offset}: {
+      projectId: string
+      path: string
+      branchId?: string
+      recursive: boolean
+      limit: number
+      offset: number
+    }) => {
       try {
         let endpoint = `/v1/projects/${projectId}/files`
         if (path) {
@@ -55,7 +62,11 @@ export function registerFileTools(server: McpServer, config: Config) {
       path: z.string().describe("Path to the file"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
-    async ({projectId, path, branchId}) => {
+    async ({projectId, path, branchId}: {
+      projectId: string
+      path: string
+      branchId?: string
+    }) => {
       try {
         let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}/content`
         if (branchId) {
@@ -98,11 +109,18 @@ export function registerFileTools(server: McpServer, config: Config) {
     {
       projectId: z.string().describe("ID of the project"),
       path: z.string().describe("Path to the new file or directory"),
-      type: z.enum(["file", "directory"]).describe("Type of resource to create"),
+      type: z.enum(["file", "interval", "http", "email", "script", "directory"])
+        .describe("Type of resource to create: file, interval, http, email, script, or directory"),
       content: z.string().optional().describe("Content for the file (required for files, not for directories)"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
-    async ({projectId, path, type, content, branchId}) => {
+    async ({projectId, path, type, content, branchId}: {
+      projectId: string
+      path: string
+      type: "file" | "interval" | "http" | "email" | "script" | "directory"
+      content?: string
+      branchId?: string
+    }) => {
       try {
         // Validate that content is provided for files
         if (type === "file" && content === undefined) {
@@ -149,7 +167,12 @@ export function registerFileTools(server: McpServer, config: Config) {
       content: z.string().describe("New content for the file"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
-    async ({projectId, path, content, branchId}) => {
+    async ({projectId, path, content, branchId}: {
+      projectId: string
+      path: string
+      content: string
+      branchId?: string
+    }) => {
       try {
         let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}`
         if (branchId) {
@@ -182,7 +205,11 @@ export function registerFileTools(server: McpServer, config: Config) {
       path: z.string().describe("Path to the file or directory"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
-    async ({projectId, path, branchId}) => {
+    async ({projectId, path, branchId}: {
+      projectId: string
+      path: string
+      branchId?: string
+    }) => {
       try {
         let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}`
         if (branchId) {

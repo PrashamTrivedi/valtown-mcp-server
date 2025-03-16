@@ -14,7 +14,11 @@ export function registerBranchTools(server: McpServer, config: Config) {
       limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of results to return"),
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
     },
-    async ({projectId, limit, offset}) => {
+    async ({projectId, limit, offset}: {
+      projectId: string
+      limit: number
+      offset: number
+    }) => {
       try {
         const data = await callValTownApi(
           config,
@@ -41,7 +45,10 @@ export function registerBranchTools(server: McpServer, config: Config) {
       projectId: z.string().describe("ID of the project"),
       branchId: z.string().describe("ID of the branch"),
     },
-    async ({projectId, branchId}) => {
+    async ({projectId, branchId}: {
+      projectId: string
+      branchId: string
+    }) => {
       try {
         const data = await callValTownApi(config, `/v1/projects/${projectId}/branches/${branchId}`)
 
@@ -66,7 +73,11 @@ export function registerBranchTools(server: McpServer, config: Config) {
       name: z.string().describe("Name for the branch"),
       forkedBranchId: z.string().optional().describe("ID of branch to fork from (optional)"),
     },
-    async ({projectId, name, forkedBranchId}) => {
+    async ({projectId, name, forkedBranchId}: {
+      projectId: string
+      name: string
+      forkedBranchId?: string
+    }) => {
       try {
         const payload = {
           name,
@@ -98,7 +109,10 @@ export function registerBranchTools(server: McpServer, config: Config) {
       projectId: z.string().describe("ID of the project"),
       branchId: z.string().describe("ID of the branch to delete"),
     },
-    async ({projectId, branchId}) => {
+    async ({projectId, branchId}: {
+      projectId: string
+      branchId: string
+    }) => {
       try {
         await callValTownApi(config, `/v1/projects/${projectId}/branches/${branchId}`, {
           method: "DELETE",

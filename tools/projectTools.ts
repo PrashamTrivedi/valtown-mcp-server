@@ -12,7 +12,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
       limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of results to return"),
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
     },
-    async ({limit, offset}) => {
+    async ({limit, offset}: {limit: number; offset: number}) => {
       try {
         const data = await callValTownApi(
           config,
@@ -39,7 +39,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
     {
       projectId: z.string().describe("ID of the project"),
     },
-    async ({projectId}) => {
+    async ({projectId}: {projectId: string}) => {
       try {
         const data = await callValTownApi(config, `/v1/projects/${projectId}`)
 
@@ -64,7 +64,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
       username: z.string().describe("Username of the project's owner"),
       projectName: z.string().describe("Name of the project"),
     },
-    async ({username, projectName}) => {
+    async ({username, projectName}: {username: string; projectName: string}) => {
       try {
         const data = await callValTownApi(
           config,
@@ -95,7 +95,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
       description: z.string().optional().describe("Description for the project (optional)"),
       imageUrl: z.string().optional().describe("URL to an image for the project (optional)"),
     },
-    async ({name, privacy, description, imageUrl}) => {
+    async ({name, privacy, description, imageUrl}: {name: string; privacy: "public" | "private"; description?: string; imageUrl?: string}) => {
       try {
         const payload = {
           name,
@@ -129,7 +129,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
     {
       projectId: z.string().describe("ID of the project to delete"),
     },
-    async ({projectId}) => {
+    async ({projectId}: {projectId: string}) => {
       try {
         await callValTownApi(config, `/v1/projects/${projectId}`, {
           method: "DELETE",

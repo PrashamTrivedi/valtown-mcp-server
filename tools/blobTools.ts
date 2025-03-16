@@ -12,7 +12,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
     {
       prefix: z.string().optional().describe("If specified, only include blobs that start with this string"),
     },
-    async ({prefix}) => {
+    async ({prefix}: {prefix: string}) => {
       try {
         const queryParams = prefix ? `?prefix=${encodeURIComponent(prefix)}` : ""
         const data = await callValTownApi(config, `/v1/blob${queryParams}`)
@@ -36,7 +36,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
     {
       key: z.string().min(1).max(512).describe("Key that uniquely identifies this blob"),
     },
-    async ({key}) => {
+    async ({key}: {key: string}) => {
       try {
         // For blobs, we need to handle binary data differently
         const url = `${config.apiBase}/v1/blob/${encodeURIComponent(key)}`
@@ -87,7 +87,12 @@ export function registerBlobTools(server: McpServer, config: Config) {
       isBase64: z.boolean().default(false).describe("Whether the data is base64-encoded binary"),
       contentType: z.string().default("text/plain").describe("Content type of the blob"),
     },
-    async ({key, data, isBase64, contentType}) => {
+    async ({key, data, isBase64, contentType}: {
+      key: string
+      data: string
+      isBase64: boolean
+      contentType: string
+    }) => {
       try {
         // Convert from base64 if needed
         let bodyData = data
@@ -135,7 +140,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
     {
       key: z.string().min(1).max(512).describe("Key that uniquely identifies this blob"),
     },
-    async ({key}) => {
+    async ({key}: {key: string}) => {
       try {
         await callValTownApi(config, `/v1/blob/${encodeURIComponent(key)}`, {
           method: "DELETE",

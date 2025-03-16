@@ -12,7 +12,7 @@ export function registerUserTools(server: McpServer, config: Config) {
     {
       username: z.string().describe("Username of the user to look for (without @ symbol)"),
     },
-    async ({username}) => {
+    async ({username}: {username: string}) => {
       try {
         const data = await callValTownApi(config, `/v1/alias/${encodeURIComponent(username)}`)
 

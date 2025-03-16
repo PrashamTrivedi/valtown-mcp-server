@@ -13,7 +13,11 @@ export function registerValTools(server: McpServer, config: Config) {
       limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of results to return"),
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
     },
-    async ({query, limit, offset}) => {
+    async ({query, limit, offset}: {
+      query: string
+      limit: number
+      offset: number
+    }) => {
       try {
         const data = await callValTownApi(
           config,
@@ -41,7 +45,10 @@ export function registerValTools(server: McpServer, config: Config) {
       username: z.string().describe("Username of the val's owner"),
       valName: z.string().describe("Name of the val"),
     },
-    async ({username, valName}) => {
+    async ({username, valName}: {
+      username: string
+      valName: string
+    }) => {
       try {
         const data = await callValTownApi(
           config,
@@ -74,7 +81,13 @@ export function registerValTools(server: McpServer, config: Config) {
         .describe("Type of val (script is for libraries or one-off calculations)"),
       readme: z.string().optional().describe("Markdown readme for the val (optional)"),
     },
-    async ({name, code, privacy, type, readme}) => {
+    async ({name, code, privacy, type, readme}: {
+      name: string
+      code: string
+      privacy: "public" | "unlisted" | "private"
+      type: "interval" | "http" | "express" | "email" | "script" | "rpc" | "httpnext"
+      readme?: string
+    }) => {
       try {
         const payload = {
           name,
@@ -116,7 +129,14 @@ export function registerValTools(server: McpServer, config: Config) {
         .describe("Type of val (optional)"),
       readme: z.string().optional().describe("Markdown readme for the val (optional)"),
     },
-    async ({valId, ...updates}) => {
+    async ({valId, ...updates}: {
+      valId: string
+      code?: string
+      name?: string
+      privacy?: "public" | "unlisted" | "private"
+      type?: "interval" | "http" | "express" | "email" | "script" | "rpc" | "httpnext"
+      readme?: string
+    }) => {
       try {
         if (Object.keys(updates).length === 0) {
           return {
@@ -157,7 +177,10 @@ export function registerValTools(server: McpServer, config: Config) {
       valId: z.string().uuid().describe("ID of the val"),
       code: z.string().describe("New TypeScript code for the val"),
     },
-    async ({valId, code}) => {
+    async ({valId, code}: {
+      valId: string
+      code: string
+    }) => {
       try {
         const data = await callValTownApi(config, `/v1/vals/${valId}/versions`, {
           method: "POST",
@@ -184,7 +207,7 @@ export function registerValTools(server: McpServer, config: Config) {
     {
       valId: z.string().uuid().describe("ID of the val to delete"),
     },
-    async ({valId}) => {
+    async ({valId}: {valId: string}) => {
       try {
         await callValTownApi(config, `/v1/vals/${valId}`, {
           method: "DELETE",
