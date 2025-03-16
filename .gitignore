@@ -1,0 +1,18 @@
+# Build outputs
+/build/
+
+# Environment variables
+.env
+
+# Deno
+.deno/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+{
+  "tasks": {
+    "start": "deno run --allow-net --allow-env --allow-read mod.ts",
+    "dev": "deno run --watch --allow-net --allow-env --allow-read mod.ts",
+    "build": "deno task build:linux && deno task build:windows && deno task build:macos",
+    "build:linux": "deno compile --output build/valtown-mcp-linux --target x86_64-unknown-linux-gnu --allow-net --allow-env --allow-read mod.ts",
+    "build:windows": "deno compile --output build/valtown-mcp-windows.exe --target x86_64-pc-windows-msvc --allow-net --allow-env --allow-read mod.ts",
+    "build:macos": "deno compile --output build/valtown-mcp-macos --target x86_64-apple-darwin --allow-net --allow-env --allow-read mod.ts",
+  },
+  "imports": {
+    "zod": "npm:zod",
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk/server"
+  }
+}
