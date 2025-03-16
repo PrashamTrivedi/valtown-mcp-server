@@ -1,0 +1,57 @@
+name: Nightly Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Build binaries
+        run: deno task build
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Delete existing nightly release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          tag_name: nightly
+          delete_release: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Create nightly release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Nightly Build (${{ steps.date.outputs.date }})
+          tag_name: nightly
+          prerelease: true
+          body: |
+            Nightly build from the latest main branch commit.
+            Commit: ${{ github.sha }}
+            Built on: ${{ steps.date.outputs.date }}
+            
+            ⚠️ This is an automated nightly build and may contain bugs or unstable features. Use at your own risk.
+          files: |
+            build/valtown-mcp-linux
+            build/valtown-mcp-windows.exe
+            build/valtown-mcp-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

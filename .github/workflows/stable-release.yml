@@ -1,0 +1,59 @@
+name: Stable Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Create Stable Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Build binaries
+        run: deno task build
+
+      - name: Get tag version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ValTown MCP Server ${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          body: |
+            # ValTown MCP Server ${{ steps.get_version.outputs.VERSION }}
+            
+            ## Installation
+
+            Download the appropriate binary for your platform and follow the instructions in the [README](https://github.com/${{ github.repository }}/blob/main/README.md).
+            
+            ## Environment Variables Required
+            
+            - `VAL_TOWN_API_TOKEN`: Your ValTown API token
+            
+            ## Release Artifacts
+            
+            - `valtown-mcp-linux`: Linux binary (x86_64)
+            - `valtown-mcp-windows.exe`: Windows binary (x86_64)
+            - `valtown-mcp-macos`: macOS binary (x86_64)
+          files: |
+            build/valtown-mcp-linux
+            build/valtown-mcp-windows.exe
+            build/valtown-mcp-macos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
