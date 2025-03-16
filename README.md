@@ -1,6 +1,7 @@
 # ValTown MCP Server
 
-A Model Context Protocol (MCP) server for [ValTown](https://www.val.town/) that allows AI assistants to execute code in the ValTown environment.
+A Model Context Protocol (MCP) server for [ValTown](https://www.val.town/) that
+allows AI assistants to execute code in the ValTown environment.
 
 ## Features
 
@@ -12,7 +13,9 @@ A Model Context Protocol (MCP) server for [ValTown](https://www.val.town/) that 
 
 ### Option 1: Use pre-built binaries
 
-Download the appropriate binary for your platform from the [latest release](https://github.com/YOUR_USERNAME/valtown-mcp-server/releases/latest):
+Download the appropriate binary for your platform from the
+[latest release](https://github.com/YOUR_USERNAME/valtown-mcp-server/releases/latest):
+
 - Linux: `valtown-mcp-linux`
 - Windows: `valtown-mcp-windows.exe`
 - macOS: `valtown-mcp-macos`
@@ -38,11 +41,13 @@ deno task dev    # Run the server with watch mode for development
 
 ## Configuration
 
-The server requires a ValTown API token to operate. Set the following environment variable:
+The server requires a ValTown API token to operate. Set the following
+environment variable:
 
 - `VAL_TOWN_API_TOKEN`: Your ValTown API token (starts with `vtwn_`)
 
-You can obtain a ValTown API token from your [ValTown account settings](https://www.val.town/settings).
+You can obtain a ValTown API token from your
+[ValTown account settings](https://www.val.town/settings).
 
 ## Usage with MCP Clients
 
@@ -123,13 +128,15 @@ claude mcp add valtown /path/to/valtown-mcp-macos -e VAL_TOWN_API_TOKEN=vtwn_KEY
 
 ### Other MCP Compatible Clients
 
-For other MCP compatible clients, configure them to point to the ValTown MCP server binary and ensure the `VAL_TOWN_API_TOKEN` environment variable is set.
+For other MCP compatible clients, configure them to point to the ValTown MCP
+server binary and ensure the `VAL_TOWN_API_TOKEN` environment variable is set.
 
 ## Troubleshooting
 
 - Ensure your ValTown API token is valid
 - Check that the server has network access
-- Verify the correct permissions are set on the binary (Linux/macOS may require `chmod +x`)
+- Verify the correct permissions are set on the binary (Linux/macOS may require
+  `chmod +x`)
 
 ## Contributing
 
@@ -137,4 +144,5 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
+for details.
