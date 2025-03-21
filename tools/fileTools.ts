@@ -27,11 +27,8 @@ export function registerFileTools(server: McpServer, config: Config) {
     }) => {
       try {
         let endpoint = `/v1/projects/${projectId}/files`
-        if (path) {
-          endpoint += `/${encodeURIComponent(path)}`
-        }
 
-        let queryParams = `?limit=${limit}&offset=${offset}`
+        let queryParams = `?path=${encodeURIComponent(path)}&limit=${limit}&offset=${offset}`
         if (branchId) {
           queryParams += `&branch_id=${encodeURIComponent(branchId)}`
         }
@@ -68,10 +65,12 @@ export function registerFileTools(server: McpServer, config: Config) {
       branchId?: string
     }) => {
       try {
-        let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}/content`
+        let endpoint = `/v1/projects/${projectId}/files/content`
+        let queryParams = `?path=${encodeURIComponent(path)}`
         if (branchId) {
-          endpoint += `?branch_id=${encodeURIComponent(branchId)}`
+          queryParams += `&branch_id=${encodeURIComponent(branchId)}`
         }
+        endpoint += queryParams
 
         // For file content, we need to handle the response differently
         const url = `${config.apiBase}${endpoint}`
@@ -110,8 +109,8 @@ export function registerFileTools(server: McpServer, config: Config) {
       projectId: z.string().describe("ID of the project"),
       path: z.string().describe("Path to the new file or directory"),
       type: z.enum(["file", "interval", "http", "email", "script", "directory"])
-        .describe("Type of resource to create: file, interval, http, email, script, or directory"),
-      content: z.string().optional().describe("Content for the file (required for files, not for directories)"),
+        .describe("Type of resource to create: file, interval, http, email, script, or directory. To generate code, use interval (for cron), email (for email receiver), http (For servers or webpages), script (For any other scripts)"),
+      content: z.string().optional().describe("Content for the file (required for files, not for directories, the code must be in typescript)"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
     async ({projectId, path, type, content, branchId}: {
@@ -123,17 +122,19 @@ export function registerFileTools(server: McpServer, config: Config) {
     }) => {
       try {
         // Validate that content is provided for files
-        if (type === "file" && content === undefined) {
+        if (type !== "directory" && content === undefined) {
           return {
             content: [{type: "text", text: "Error: Content is required when creating a file"}],
             isError: true,
           }
         }
 
-        let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}`
+        let endpoint = `/v1/projects/${projectId}/files`
+        let queryParams = `?path=${encodeURIComponent(path)}`
         if (branchId) {
-          endpoint += `?branch_id=${encodeURIComponent(branchId)}`
+          queryParams += `&branch_id=${encodeURIComponent(branchId)}`
         }
+        endpoint += queryParams
 
         const payload = {
           type,
@@ -174,10 +175,12 @@ export function registerFileTools(server: McpServer, config: Config) {
       branchId?: string
     }) => {
       try {
-        let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}`
+        let endpoint = `/v1/projects/${projectId}/files`
+        let queryParams = `?path=${encodeURIComponent(path)}`
         if (branchId) {
-          endpoint += `?branch_id=${encodeURIComponent(branchId)}`
+          queryParams += `&branch_id=${encodeURIComponent(branchId)}`
         }
+        endpoint += queryParams
 
         const data = await callValTownApi(config, endpoint, {
           method: "PUT",
@@ -211,10 +214,12 @@ export function registerFileTools(server: McpServer, config: Config) {
       branchId?: string
     }) => {
       try {
-        let endpoint = `/v1/projects/${projectId}/files/${encodeURIComponent(path)}`
+        let endpoint = `/v1/projects/${projectId}/files`
+        let queryParams = `?path=${encodeURIComponent(path)}`
         if (branchId) {
-          endpoint += `?branch_id=${encodeURIComponent(branchId)}`
+          queryParams += `&branch_id=${encodeURIComponent(branchId)}`
         }
+        endpoint += queryParams
 
         await callValTownApi(config, endpoint, {
           method: "DELETE",

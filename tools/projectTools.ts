@@ -89,14 +89,44 @@ export function registerProjectTools(server: McpServer, config: Config) {
     "create-project",
     "Create a new project",
     {
-      name: z.string().describe("Name for the project"),
+      name: z.string()
+        .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, "Project name must start with a letter and can only contain letters, numbers, and underscores")
+        .describe("Name for the project"),
       privacy: z.enum(["public", "unlisted", "private"]).default("public")
         .describe("Privacy setting: public, unlisted, or private"),
-      description: z.string().optional().describe("Description for the project (optional)"),
+      description: z.string().max(64).optional()
+        .describe("Description for the project (optional, max 64 characters)"),
       imageUrl: z.string().optional().describe("URL to an image for the project (optional)"),
     },
-    async ({name, privacy, description, imageUrl}: {name: string; privacy: "public" | "private"; description?: string; imageUrl?: string}) => {
+    async ({name, privacy, description, imageUrl}: {
+      name: string
+      privacy: "public" | "unlisted" | "private"
+      description?: string
+      imageUrl?: string
+    }) => {
       try {
+        // Validate project name
+        if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(name)) {
+          return {
+            content: [{
+              type: "text",
+              text: "Error: Project name must start with a letter and can only contain letters, numbers, and underscores"
+            }],
+            isError: true,
+          }
+        }
+
+        // Validate description length
+        if (description && description.length > 64) {
+          return {
+            content: [{
+              type: "text",
+              text: "Error: Description must be 64 characters or less"
+            }],
+            isError: true,
+          }
+        }
+
         const payload = {
           name,
           privacy,
