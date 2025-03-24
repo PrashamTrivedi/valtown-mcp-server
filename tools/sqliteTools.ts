@@ -96,8 +96,8 @@ export function registerSqliteTools(server: McpServer, config: Config) {
       mode: z.enum(["read", "write"]).default("read").describe("Mode of the statements (read or write)"),
     },
     async ({statements, mode}: {
-      statements: string
-      mode: string // or a more specific type if applicable
+      statements: string[]
+      mode: "read" | "write" // or a more specific type if applicable
     }) => {
       try {
         const data = await callValTownApi(config, "/v1/sqlite/exec", {

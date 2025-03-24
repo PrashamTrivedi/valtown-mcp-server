@@ -9,6 +9,7 @@
   },
   "imports": {
     "zod": "npm:zod",
-    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk/server"
+    "@modelcontextprotocol/sdk/server": "npm:@modelcontextprotocol/sdk/server",
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk"
   }
 }

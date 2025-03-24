@@ -12,7 +12,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
     {
       prefix: z.string().optional().describe("If specified, only include blobs that start with this string"),
     },
-    async ({prefix}: {prefix: string}) => {
+    async ({prefix}: {prefix?: string}) => {
       try {
         const queryParams = prefix ? `?prefix=${encodeURIComponent(prefix)}` : ""
         const data = await callValTownApi(config, `/v1/blob${queryParams}`)

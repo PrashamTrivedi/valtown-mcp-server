@@ -1,6 +1,6 @@
-import {McpServer} from "@modelcontextprotocol/sdk/mcp.js"
-import {StdioServerTransport} from "@modelcontextprotocol/sdk/stdio.js"
-import {registerTools} from "./registerTools.ts"
+import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js"
+import {registerPromptsTools, registerTools} from "./registerTools.ts"
 import {loadConfig} from "./config.ts"
 
 // Load configuration
@@ -14,6 +14,8 @@ const server = new McpServer({
 
 // Register tools
 registerTools(server, config)
+registerPromptsTools(server, config)
+
 
 // Start the server
 const transport = new StdioServerTransport()

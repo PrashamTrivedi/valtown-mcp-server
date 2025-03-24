@@ -7,6 +7,7 @@ import {registerBranchTools} from "./tools/branchTools.ts"
 import {registerFileTools} from "./tools/fileTools.ts"
 import {registerSqliteTools} from "./tools/sqliteTools.ts"
 import {registerBlobTools} from "./tools/blobTools.ts"
+import {registerPrompts} from "./prompts/promptsTools.ts"
 
 export function registerTools(server: McpServer, config: Config) {
     registerUserTools(server, config)
@@ -16,4 +17,9 @@ export function registerTools(server: McpServer, config: Config) {
     registerFileTools(server, config)
     registerSqliteTools(server, config)
     registerBlobTools(server, config)
+
+}
+
+export function registerPromptsTools(server: McpServer, config: Config) {
+    registerPrompts(server, config)
 }
