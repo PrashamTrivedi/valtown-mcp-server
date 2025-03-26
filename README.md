@@ -142,6 +142,10 @@ server binary and ensure the `VAL_TOWN_API_TOKEN` environment variable is set.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Changelog
+
+See the [CHANGELOG](CHANGELOG.md) for a list of notable changes to this project.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
