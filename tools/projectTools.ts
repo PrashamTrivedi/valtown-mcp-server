@@ -23,6 +23,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error listing projects: ${errorMessage}`}],
@@ -47,6 +48,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error getting project: ${errorMessage}`}],
@@ -75,6 +77,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error getting project: ${errorMessage}`}],
@@ -143,6 +146,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error creating project: ${errorMessage}`}],
@@ -169,6 +173,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "Project deleted successfully"}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error deleting project: ${errorMessage}`}],

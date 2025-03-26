@@ -21,6 +21,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error listing blobs: ${getErrorMessage(error)}`}],
           isError: true,
@@ -69,6 +70,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
           }],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error getting blob: ${getErrorMessage(error)}`}],
           isError: true,
@@ -125,6 +127,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "Blob stored successfully"}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error storing blob: ${getErrorMessage(error)}`}],
           isError: true,
@@ -150,6 +153,7 @@ export function registerBlobTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "Blob deleted successfully"}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error deleting blob: ${getErrorMessage(error)}`}],
           isError: true,

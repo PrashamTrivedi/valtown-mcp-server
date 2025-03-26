@@ -1,11 +1,7 @@
 import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
-import {
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema
-} from "@modelcontextprotocol/sdk/types.js"
 import {Config} from "../lib/types.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
-
+import {z} from "zod"
 
 // Define prompt structure type
 type PromptDefinition = {
@@ -19,7 +15,7 @@ type PromptDefinition = {
 }
 
 // Define prompt templates
-const PROMPTS: Record<string, PromptDefinition> = {
+const _PROMPTS: Record<string, PromptDefinition> = {
   "townie": {
     name: "townie",
     description: "A simple prompt for basic Val Town operations",
@@ -45,30 +41,16 @@ const PROMPTS: Record<string, PromptDefinition> = {
 }
 
 // Register prompt capabilities with server
-export function registerPrompts(server: McpServer, config: Config) {
-
-
-  // List available prompts
-  server.server.setRequestHandler(ListPromptsRequestSchema, () => {
-    return {
-      prompts: Object.values(PROMPTS)
-    }
-  })
-
-  // Get specific prompt
-  server.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-    const promptName = request.params.name
-    const prompt = PROMPTS[promptName]
-    if (!prompt) {
-      throw new Error(`Prompt not found: ${promptName}`)
-    }
-
-    try {
-      // Handle Townie prompt (created by the Val Town team)
-      if (promptName === "townie") {
-        const towniePrompt = Deno.readFileSync(
-          new URL("../prompts/townie.txt", import.meta.url)
+export function registerPrompts(server: McpServer, _config: Config) {
+  // Townie prompt 
+  server.prompt(
+    "townie",
+    {request: z.string()},
+    ({request}) => {
+      try {
+        const towniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/townie.txt`
         )
+        console.error({towniePrompt})
         return {
           messages: [
             {
@@ -77,19 +59,28 @@ export function registerPrompts(server: McpServer, config: Config) {
                 type: "text",
                 text: `
                 ${towniePrompt}
-                User Request: ${request.params.arguments?.request}`
+                User Request: ${request}`
               }
             }
           ]
         }
+      } catch (error) {
+        throw new Error(`Error processing prompt: ${getErrorMessage(error)}`)
       }
+    }
+  )
 
-      // Handle OpenTownie prompt (created by Val Town's CEO, Steve Krouse)
-      if (promptName === "opentownie") {
-        // Get additional user context if available
-        const openTowniePrompt = Deno.readFileSync(
-          new URL("../prompts/opentownie.txt", import.meta.url),
+  // OpenTownie prompt
+  server.prompt(
+    "opentownie",
+    {request: z.string()},
+    ({request}) => {
+      try {
+
+        const openTowniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/opentownie.txt`
         )
+        console.error({openTowniePrompt})
+
 
 
         return {
@@ -100,16 +91,14 @@ export function registerPrompts(server: McpServer, config: Config) {
                 type: "text",
                 text: `
                 ${openTowniePrompt}
-                User Request: ${request.params.arguments?.request}`
+                User Request: ${request}`
               }
             }
           ]
         }
+      } catch (error) {
+        throw new Error(`Error processing prompt: ${getErrorMessage(error)}`)
       }
-
-      throw new Error("Prompt implementation not found")
-    } catch (error) {
-      throw new Error(`Error processing prompt: ${getErrorMessage(error)}`)
     }
-  })
+  )
 }

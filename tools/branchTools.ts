@@ -29,6 +29,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error listing branches: ${getErrorMessage(error)}`}],
           isError: true,
@@ -56,6 +57,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error getting branch: ${getErrorMessage(error)}`}],
           isError: true,
@@ -93,6 +95,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error creating branch: ${getErrorMessage(error)}`}],
           isError: true,
@@ -122,6 +125,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "Branch deleted successfully"}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error deleting branch: ${getErrorMessage(error)}`}],
           isError: true,

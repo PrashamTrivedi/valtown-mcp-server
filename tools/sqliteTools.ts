@@ -23,6 +23,7 @@ export function registerSqliteTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error executing SQL: ${getErrorMessage(error)}`}],
           isError: true,
@@ -53,6 +54,7 @@ export function registerSqliteTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error executing SQL batch: ${getErrorMessage(error)}`}],
           isError: true,
@@ -79,6 +81,7 @@ export function registerSqliteTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error executing SQL query: ${getErrorMessage(error)}`}],
           isError: true,
@@ -109,6 +112,7 @@ export function registerSqliteTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error executing SQL exec: ${getErrorMessage(error)}`}],
           isError: true,

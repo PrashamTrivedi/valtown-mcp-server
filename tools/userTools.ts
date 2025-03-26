@@ -20,6 +20,7 @@ export function registerUserTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error getting user: ${getErrorMessage(error)}`}],
           isError: true,
@@ -41,6 +42,7 @@ export function registerUserTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error getting user info: ${getErrorMessage(error)}`}],
           isError: true,

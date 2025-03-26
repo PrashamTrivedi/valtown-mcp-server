@@ -42,6 +42,7 @@ export function registerFileTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error listing files: ${getErrorMessage(error)}`}],
           isError: true,
@@ -93,6 +94,7 @@ export function registerFileTools(server: McpServer, config: Config) {
           content: [{type: "text", text: content}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error getting file content: ${getErrorMessage(error)}`}],
           isError: true,
@@ -150,6 +152,7 @@ export function registerFileTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error creating ${type}: ${getErrorMessage(error)}`}],
           isError: true,
@@ -191,6 +194,7 @@ export function registerFileTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error updating file: ${getErrorMessage(error)}`}],
           isError: true,
@@ -229,6 +233,7 @@ export function registerFileTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "File or directory deleted successfully"}],
         }
       } catch (error) {
+        console.error(error)
         return {
           content: [{type: "text", text: `Error deleting file or directory: ${getErrorMessage(error)}`}],
           isError: true,

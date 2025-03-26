@@ -28,6 +28,7 @@ export function registerValTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error searching vals: ${errorMessage}`}],
@@ -59,6 +60,7 @@ export function registerValTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error getting val: ${errorMessage}`}],
@@ -106,6 +108,7 @@ export function registerValTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error creating val: ${errorMessage}`}],
@@ -160,6 +163,7 @@ export function registerValTools(server: McpServer, config: Config) {
           }],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error updating val: ${errorMessage}`}],
@@ -191,6 +195,7 @@ export function registerValTools(server: McpServer, config: Config) {
           content: [{type: "text", text: JSON.stringify(data, null, 2)}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error creating val version: ${errorMessage}`}],
@@ -217,6 +222,7 @@ export function registerValTools(server: McpServer, config: Config) {
           content: [{type: "text", text: "Val deleted successfully"}],
         }
       } catch (error) {
+        console.error(error)
         const errorMessage = error instanceof Error ? error.message : String(error)
         return {
           content: [{type: "text", text: `Error deleting val: ${errorMessage}`}],
