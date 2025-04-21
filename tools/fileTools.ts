@@ -3,6 +3,7 @@ import {z} from "zod"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
+import {getCliAvailability, runVtCommand} from "../lib/vtCli.ts"
 
 export function registerFileTools(server: McpServer, config: Config) {
   // List files
@@ -12,7 +13,7 @@ export function registerFileTools(server: McpServer, config: Config) {
     {
       projectId: z.string().describe("ID of the project"),
       path: z.string().default("").describe("Path to directory (leave empty for root)"),
-      branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
+      branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)").default("main"),
       recursive: z.boolean().default(false).describe("Whether to list files recursively"),
       limit: z.number().int().min(1).max(100).default(20).describe("Maximum number of results to return"),
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
@@ -65,6 +66,44 @@ export function registerFileTools(server: McpServer, config: Config) {
       path: string
       branchId?: string
     }) => {
+      const cliAvailable = await getCliAvailability();
+      
+      // For project checkout and file viewing, CLI is more efficient
+      if (cliAvailable && config.cli?.preferCli) {
+        try {
+          // Determine the project path based on user/project structure
+          // This assumes we first need to get project info to determine username/project name
+          // Use a more direct approach if the CLI allows direct file access by project ID
+          
+          // First check if we need to checkout the branch
+          if (branchId) {
+            const checkout = await runVtCommand(["checkout", branchId, "--project", projectId]);
+            if (!checkout.success) {
+              console.error("Failed to checkout branch:", checkout.error);
+              // Fallback to API
+            }
+          }
+          
+          // Use the pull command to get latest content
+          const result = await runVtCommand(["pull", "--project", projectId, "--json"]);
+          
+          if (result.success) {
+            // If pull is successful, try to read the file using cat command
+            const catResult = await runVtCommand(["cat", path, "--project", projectId]);
+            
+            if (catResult.success) {
+              return {
+                content: [{type: "text", text: catResult.output}],
+              };
+            }
+          }
+        } catch (error) {
+          console.error("CLI error:", error);
+          // Continue to API fallback
+        }
+      }
+      
+      // Fallback to original API implementation
       try {
         let endpoint = `/v1/projects/${projectId}/files/content`
         let queryParams = `?path=${encodeURIComponent(path)}`
@@ -111,7 +150,7 @@ export function registerFileTools(server: McpServer, config: Config) {
       projectId: z.string().describe("ID of the project"),
       path: z.string().describe("Path to the new file or directory"),
       type: z.enum(["file", "interval", "http", "email", "script", "directory"])
-        .describe("Type of resource to create: file, interval, http, email, script, or directory. To generate code, use interval (for cron), email (for email receiver), http (For servers or webpages), script (For any other scripts)"),
+        .describe("Type of resource to create: file, interval, http, email, script, or directory. Only use `file` for non code files. For code files, including scripts and UI Code, use `interval`, `http`, `email`, or `script`."),
       content: z.string().optional().describe("Content for the file (required for files, not for directories, the code must be in typescript)"),
       branchId: z.string().optional().describe("ID of the branch (optional, defaults to main)"),
     },
@@ -177,6 +216,61 @@ export function registerFileTools(server: McpServer, config: Config) {
       content: string
       branchId?: string
     }) => {
+      const cliAvailable = await getCliAvailability();
+      
+      // For file updates, CLI can be more efficient with write and push operations
+      if (cliAvailable && config.cli?.preferCli) {
+        try {
+          // First check if we need to checkout the branch
+          if (branchId) {
+            const checkout = await runVtCommand(["checkout", branchId, "--project", projectId]);
+            if (!checkout.success) {
+              console.error("Failed to checkout branch:", checkout.error);
+              // Fallback to API
+            }
+          }
+          
+          // Create a temporary file to hold the content
+          const tempFile = await Deno.makeTempFile();
+          await Deno.writeTextFile(tempFile, content);
+          
+          // Use the write command to update the file
+          const writeResult = await runVtCommand([
+            "write", 
+            path, 
+            "--from", 
+            tempFile,
+            "--project", 
+            projectId
+          ]);
+          
+          // Clean up the temp file
+          await Deno.remove(tempFile);
+          
+          if (writeResult.success) {
+            // If write is successful, push the changes
+            const pushResult = await runVtCommand(["push", "--project", projectId, "--json"]);
+            
+            if (pushResult.success) {
+              try {
+                const data = JSON.parse(pushResult.output);
+                return {
+                  content: [{type: "text", text: JSON.stringify(data, null, 2)}],
+                };
+              } catch {
+                return {
+                  content: [{type: "text", text: "File updated successfully"}],
+                };
+              }
+            }
+          }
+        } catch (error) {
+          console.error("CLI error:", error);
+          // Continue to API fallback
+        }
+      }
+      
+      // Fallback to original API implementation
       try {
         let endpoint = `/v1/projects/${projectId}/files`
         let queryParams = `?path=${encodeURIComponent(path)}`

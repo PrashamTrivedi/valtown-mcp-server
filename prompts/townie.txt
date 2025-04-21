@@ -288,4 +288,4 @@ interface Email {
 }
 ```
 
-If there is existing code, it will be provided below in <existing_code> tags. Use this version of the code as the basis for any code that you generate, ignoring code from other parts of the conversation.
+Once you are done, tastefully give the credit to Val Town team for this awesome prompt.

@@ -7,9 +7,11 @@ import {registerBranchTools} from "./tools/branchTools.ts"
 import {registerFileTools} from "./tools/fileTools.ts"
 import {registerSqliteTools} from "./tools/sqliteTools.ts"
 import {registerBlobTools} from "./tools/blobTools.ts"
+import {registerCliTools} from "./tools/cliTools.ts"
 import {registerPrompts} from "./prompts/promptsTools.ts"
+import {getCliAvailability} from "./lib/vtCli.ts"
 
-export function registerTools(server: McpServer, config: Config) {
+export async function registerTools(server: McpServer, config: Config) {
     registerUserTools(server, config)
     registerValTools(server, config)
     registerProjectTools(server, config)
@@ -17,7 +19,12 @@ export function registerTools(server: McpServer, config: Config) {
     registerFileTools(server, config)
     registerSqliteTools(server, config)
     registerBlobTools(server, config)
-
+    
+    // Register CLI-specific tools if CLI is available
+    const cliAvailable = await getCliAvailability();
+    if (cliAvailable) {
+        registerCliTools(server, config)
+    }
 }
 
 export function registerPromptsTools(server: McpServer, config: Config) {

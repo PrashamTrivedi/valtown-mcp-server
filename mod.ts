@@ -12,8 +12,8 @@ const server = new McpServer({
     version: "1.0.0",
 })
 
-// Register tools
-registerTools(server, config)
+// Register tools (async)
+await registerTools(server, config)
 registerPromptsTools(server, config)
 
 

@@ -9,8 +9,16 @@ export function loadConfig() {
         Deno.exit(1)
     }
 
+    // CLI preference configuration
+    const PREFER_CLI = Deno.env.get("VAL_TOWN_PREFER_CLI") !== "false"; // Default to true
+    const CLI_PATH = Deno.env.get("VAL_TOWN_CLI_PATH") || "vt"; // Default to "vt" in PATH
+
     return {
         apiToken: API_TOKEN,
         apiBase: "https://api.val.town",
+        cli: {
+            preferCli: PREFER_CLI,
+            path: CLI_PATH,
+        }
     }
 }

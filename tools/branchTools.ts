@@ -3,6 +3,7 @@ import {z} from "zod"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
+import {getCliAvailability, runVtCommand} from "../lib/vtCli.ts"
 
 export function registerBranchTools(server: McpServer, config: Config) {
   // List branches in a project
@@ -80,6 +81,42 @@ export function registerBranchTools(server: McpServer, config: Config) {
       name: string
       forkedBranchId?: string
     }) => {
+      // Check if CLI is available
+      const cliAvailable = await getCliAvailability();
+      
+      if (cliAvailable && config.cli?.preferCli) {
+        try {
+          // Construct CLI command for branch creation
+          const branchArgs = ["branch", "create", name];
+          
+          // Add source branch if provided
+          if (forkedBranchId) {
+            branchArgs.push("--source", forkedBranchId);
+          }
+          
+          // Add project ID
+          branchArgs.push("--project", projectId);
+          
+          // Add JSON output format
+          branchArgs.push("--json");
+          
+          const result = await runVtCommand(branchArgs);
+          
+          if (result.success) {
+            // Parse JSON output from CLI
+            const data = JSON.parse(result.output);
+            return {
+              content: [{type: "text", text: JSON.stringify(data, null, 2)}],
+            };
+          }
+          // If CLI fails, fall back to API
+        } catch (error) {
+          console.error("CLI error:", error);
+          // Continue to API fallback
+        }
+      }
+      
+      // Fallback to original API implementation
       try {
         const payload = {
           name,

@@ -14,31 +14,7 @@ type PromptDefinition = {
   }[]
 }
 
-// Define prompt templates
-const _PROMPTS: Record<string, PromptDefinition> = {
-  "townie": {
-    name: "townie",
-    description: "A simple prompt for basic Val Town operations",
-    arguments: [
-      {
-        name: "request",
-        description: "User's request to execute",
-        required: true
-      }
-    ]
-  },
-  "opentownie": {
-    name: "opentownie",
-    description: "A comprehensive prompt for advanced Val Town workflows",
-    arguments: [
-      {
-        name: "request",
-        description: "User's request to execute",
-        required: true
-      },
-    ]
-  }
-}
+
 
 // Register prompt capabilities with server
 export function registerPrompts(server: McpServer, _config: Config) {
@@ -49,7 +25,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
     ({request}) => {
       try {
         const towniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/townie.txt`
-        )
+        ).trim()
         console.error({towniePrompt})
         return {
           messages: [
@@ -58,7 +34,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
               content: {
                 type: "text",
                 text: `
-                ${towniePrompt}
+                ${towniePrompt}\n\n
                 User Request: ${request}`
               }
             }
@@ -78,7 +54,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
       try {
 
         const openTowniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/opentownie.txt`
-        )
+        ).trim()
         console.error({openTowniePrompt})
 
 
@@ -90,7 +66,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
               content: {
                 type: "text",
                 text: `
-                ${openTowniePrompt}
+                ${openTowniePrompt}\n\n
                 User Request: ${request}`
               }
             }

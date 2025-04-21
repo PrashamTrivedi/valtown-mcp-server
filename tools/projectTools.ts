@@ -2,6 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
 import {z} from "zod"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
+import {getCliAvailability, runVtCommand} from "../lib/vtCli.ts"
 
 export function registerProjectTools(server: McpServer, config: Config) {
   // List all projects
@@ -67,6 +68,29 @@ export function registerProjectTools(server: McpServer, config: Config) {
       projectName: z.string().describe("Name of the project"),
     },
     async ({username, projectName}: {username: string; projectName: string}) => {
+      // Check if CLI is available
+      const cliAvailable = await getCliAvailability();
+      
+      if (cliAvailable && config.cli?.preferCli) {
+        try {
+          // First, try to use vt CLI
+          const result = await runVtCommand(["clone", `${username}/${projectName}`, "--json"]);
+          
+          if (result.success) {
+            // Parse JSON output from CLI
+            const data = JSON.parse(result.output);
+            return {
+              content: [{type: "text", text: JSON.stringify(data, null, 2)}],
+            };
+          }
+          // If CLI fails, fall back to API
+        } catch (error) {
+          console.error("CLI error:", error);
+          // Continue to API fallback
+        }
+      }
+      
+      // Fallback to original API implementation
       try {
         const data = await callValTownApi(
           config,
@@ -95,7 +119,7 @@ export function registerProjectTools(server: McpServer, config: Config) {
       name: z.string()
         .regex(/^[a-zA-Z][a-zA-Z0-9_]*$/, "Project name must start with a letter and can only contain letters, numbers, and underscores")
         .describe("Name for the project"),
-      privacy: z.enum(["public", "unlisted", "private"]).default("public")
+      privacy: z.enum(["public", "unlisted", "private"]).default("unlisted")
         .describe("Privacy setting: public, unlisted, or private"),
       description: z.string().max(64).optional()
         .describe("Description for the project (optional, max 64 characters)"),
