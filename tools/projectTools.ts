@@ -69,27 +69,27 @@ export function registerProjectTools(server: McpServer, config: Config) {
     },
     async ({username, projectName}: {username: string; projectName: string}) => {
       // Check if CLI is available
-      const cliAvailable = await getCliAvailability();
-      
-      if (cliAvailable && config.cli?.preferCli) {
+      const cliAvailable = await getCliAvailability()
+
+      if (cliAvailable && (config.cli?.preferCli ?? false)) {
         try {
           // First, try to use vt CLI
-          const result = await runVtCommand(["clone", `${username}/${projectName}`, "--json"]);
-          
+          const result = await runVtCommand(["clone", `${username}/${projectName}`, "--json"])
+
           if (result.success) {
             // Parse JSON output from CLI
-            const data = JSON.parse(result.output);
+            const data = JSON.parse(result.output)
             return {
               content: [{type: "text", text: JSON.stringify(data, null, 2)}],
-            };
+            }
           }
           // If CLI fails, fall back to API
         } catch (error) {
-          console.error("CLI error:", error);
+          console.error("CLI error:", error)
           // Continue to API fallback
         }
       }
-      
+
       // Fallback to original API implementation
       try {
         const data = await callValTownApi(

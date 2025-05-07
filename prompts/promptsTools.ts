@@ -2,17 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
 import {z} from "zod"
-
-// Define prompt structure type
-type PromptDefinition = {
-  name: string
-  description: string
-  arguments: {
-    name: string
-    description: string
-    required: boolean
-  }[]
-}
+import {getCliAvailability} from "../lib/vtCli.ts"
 
 
 
@@ -20,13 +10,15 @@ type PromptDefinition = {
 export function registerPrompts(server: McpServer, _config: Config) {
   // Townie prompt 
   server.prompt(
-    "townie",
+    "valley",
     {request: z.string()},
-    ({request}) => {
+    async ({request}) => {
       try {
-        const towniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/townie.txt`
-        ).trim()
-        console.error({towniePrompt})
+        const promptPath = _config.prompts?.valleyPath || _config.prompts?.defaultValleyPath
+        const promptContent = Deno.readTextFileSync(promptPath ?? `${import.meta.dirname}/valley.txt`)
+
+          .trim()
+        console.error({promptContent})
         return {
           messages: [
             {
@@ -34,8 +26,8 @@ export function registerPrompts(server: McpServer, _config: Config) {
               content: {
                 type: "text",
                 text: `
-                ${towniePrompt}\n\n
-                User Request: ${request}`
+                ${promptContent.trim()}\n\n
+                <UserRequest> ${request} </UserRequest>`
               }
             }
           ]
@@ -46,35 +38,5 @@ export function registerPrompts(server: McpServer, _config: Config) {
     }
   )
 
-  // OpenTownie prompt
-  server.prompt(
-    "opentownie",
-    {request: z.string()},
-    ({request}) => {
-      try {
 
-        const openTowniePrompt = Deno.readTextFileSync(`${import.meta.dirname}/opentownie.txt`
-        ).trim()
-        console.error({openTowniePrompt})
-
-
-
-        return {
-          messages: [
-            {
-              role: "user",
-              content: {
-                type: "text",
-                text: `
-                ${openTowniePrompt}\n\n
-                User Request: ${request}`
-              }
-            }
-          ]
-        }
-      } catch (error) {
-        throw new Error(`Error processing prompt: ${getErrorMessage(error)}`)
-      }
-    }
-  )
 }
