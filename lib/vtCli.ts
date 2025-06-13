@@ -68,3 +68,51 @@ export async function runVtCommand(args: string[]): Promise<{
     };
   }
 }
+
+/**
+ * Parse CLI JSON output (placeholder for missing function)
+ * @param output CLI output string to parse
+ * @returns Parsed JSON object or error
+ */
+export function parseCliJsonOutput(output: string): any {
+  try {
+    return JSON.parse(output);
+  } catch (error) {
+    throw new Error(`Failed to parse CLI JSON output: ${error}`);
+  }
+}
+
+/**
+ * Prepare Val workspace (placeholder for missing function)
+ * @param valId Val ID to prepare workspace for
+ * @returns Workspace preparation result
+ */
+export async function prepareValWorkspace(valId: string): Promise<{
+  success: boolean;
+  workspacePath?: string;
+  error?: string;
+}> {
+  // This is a placeholder since workspace operations are CLI-specific
+  // and not needed for remote HTTP mode
+  return {
+    success: false,
+    error: "Workspace operations not supported in remote mode"
+  };
+}
+
+/**
+ * Cleanup temporary directory (placeholder for missing function)
+ * @param dirPath Directory path to cleanup
+ * @returns Cleanup result
+ */
+export async function cleanupTempDirectory(dirPath: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  // This is a placeholder since workspace operations are CLI-specific
+  // and not needed for remote HTTP mode
+  return {
+    success: false,
+    error: "Workspace operations not supported in remote mode"
+  };
+}
