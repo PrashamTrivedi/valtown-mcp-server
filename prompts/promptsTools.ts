@@ -16,7 +16,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
       try {
         const promptPath = _config.prompts?.valleyPath || _config.prompts?.defaultValleyPath
         const useCliIfAvailable = _config.cli?.preferCli ?? false
-        const cliAvailable = useCliIfAvailable && await getCliAvailability(_config.cli?.path)
+        const cliAvailable = useCliIfAvailable && await getCliAvailability()
         const defaultPromptPath = `${import.meta.dirname}/prompts/${cliAvailable ? "valley.txt" : "valley_local.txt"}`
         const promptContent = Deno.readTextFileSync(promptPath ?? defaultPromptPath).trim() // Moved .trim() to the same line
 

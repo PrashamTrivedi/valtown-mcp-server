@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/path@*": "1.0.9",
     "npm:@modelcontextprotocol/sdk@*": "1.7.0_express@5.0.1_zod@3.24.2",
+    "npm:hono@*": "4.7.11",
     "npm:zod@*": "3.24.2"
   },
   "jsr": {
@@ -243,6 +244,9 @@
       "dependencies": [
         "function-bind"
       ]
+    },
+    "hono@4.7.11": {
+      "integrity": "sha512-rv0JMwC0KALbbmwJDEnxvQCeJh+xbS3KEWW5PC9cMJ08Ur9xgatI0HmtgYZfOdOSOeYsp5LO2cOhdI8cLEbDEQ=="
     },
     "http-errors@2.0.0": {
       "integrity": "sha512-FtwrG/euBzaEjYeRqOgly7G0qviiXoJWnvEH2Z1plBdXgbyjv34pHTSb9zoeHMyDy33+DWy5Wt9Wo+TURtOYSQ==",

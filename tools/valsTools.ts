@@ -17,17 +17,14 @@ export function registerValTools(server: McpServer, config: Config) {
     async ({username, valName}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
       const valReference = `${username}/${valName}`;
 
       if (cliAvailable) {
         try {
           // Use CLI implementation with the clone command and --json flag
           console.log(`Using CLI to get val: ${valReference}`);
-          const result = await runVtCommand(["clone", valReference, "--json"], {
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const result = await runVtCommand(["clone", valReference, "--json"]);
           
           if (result.success) {
             // Parse JSON output
@@ -125,10 +122,7 @@ export function registerValTools(server: McpServer, config: Config) {
             cliArgs.push("--description", description);
           }
           
-          const result = await runVtCommand(cliArgs, {
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const result = await runVtCommand(cliArgs);
           
           if (result.success) {
             // Parse JSON output

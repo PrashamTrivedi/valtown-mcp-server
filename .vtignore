@@ -11,7 +11,13 @@ CHANGELOG.md
 LICENSE
 mcp-documentation.md
 mcp.txt
-docs/
-build/
+.github
+docs
+build
+taskNotes
 valTownApi.json
 valtownAPIv2.json
+val-town-mcp-server
+prompts
+.claude
+mod.ts

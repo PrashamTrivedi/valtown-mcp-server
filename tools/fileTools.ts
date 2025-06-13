@@ -28,7 +28,7 @@ async function performFileOperationWithCli(
     // Prepare workspace with the val cloned
     const workspace = await prepareValWorkspace(valId)
 
-    if (!workspace.success || !workspace.tempDir) {
+    if (!workspace.success || !workspace.workspacePath) {
       return {
         success: false,
         error: workspace.error || "Failed to prepare workspace"
@@ -37,14 +37,10 @@ async function performFileOperationWithCli(
 
     // If a branch is specified, checkout that branch
     if (branchId) {
-      const checkoutResult = await runVtCommand(["checkout", branchId], {
-        workingDir: workspace.tempDir,
-        suppressErrors: true,
-        cliPath: config.cli?.path
-      })
+      const checkoutResult = await runVtCommand(["checkout", branchId])
 
       if (!checkoutResult.success) {
-        await cleanupTempDirectory(workspace.tempDir)
+        await cleanupTempDirectory(workspace.workspacePath!)
         return {
           success: false,
           error: `Failed to checkout branch: ${checkoutResult.error}`
@@ -53,10 +49,10 @@ async function performFileOperationWithCli(
     }
 
     // Perform the specific file operation
-    const operationSuccess = await operation(workspace.tempDir)
+    const operationSuccess = await operation(workspace.workspacePath!)
 
     if (!operationSuccess) {
-      await cleanupTempDirectory(workspace.tempDir)
+      await cleanupTempDirectory(workspace.workspacePath!)
       return {
         success: false,
         error: `File operation failed`
@@ -64,14 +60,10 @@ async function performFileOperationWithCli(
     }
 
     // Push changes back to Val Town
-    const pushResult = await runVtCommand(["push", "--json"], {
-      workingDir: workspace.tempDir,
-      suppressErrors: true,
-      cliPath: config.cli?.path
-    })
+    const pushResult = await runVtCommand(["push", "--json"])
 
     // Clean up temporary workspace
-    await cleanupTempDirectory(workspace.tempDir)
+    await cleanupTempDirectory(workspace.workspacePath!)
 
     if (!pushResult.success) {
       return {
@@ -111,7 +103,7 @@ export function registerFileTools(server: McpServer, config: Config) {
     async ({valId, path, branchId, recursive, limit, offset}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path)
+      const cliAvailable = useCliIfAvailable && await getCliAvailability()
 
       if (cliAvailable) {
         try {
@@ -121,18 +113,14 @@ export function registerFileTools(server: McpServer, config: Config) {
           // Prepare a workspace with the val cloned
           const workspace = await prepareValWorkspace(valId)
 
-          if (workspace.success && workspace.tempDir) {
+          if (workspace.success && workspace.workspacePath) {
             // If a branch is specified, checkout that branch first
             if (branchId) {
-              const checkoutResult = await runVtCommand(["checkout", branchId], {
-                workingDir: workspace.tempDir,
-                suppressErrors: true,
-                cliPath: config.cli?.path
-              })
+              const checkoutResult = await runVtCommand(["checkout", branchId])
 
               if (!checkoutResult.success) {
                 console.error(`Failed to checkout branch: ${checkoutResult.error}`)
-                await cleanupTempDirectory(workspace.tempDir)
+                await cleanupTempDirectory(workspace.workspacePath!)
                 // Fall back to API
                 console.error("CLI error when checking out branch, falling back to API")
                 throw new Error("Failed to checkout branch")
@@ -140,14 +128,10 @@ export function registerFileTools(server: McpServer, config: Config) {
             }
 
             // Run the status command to list files
-            const result = await runVtCommand(["status", "--json"], {
-              workingDir: workspace.tempDir,
-              suppressErrors: true,
-              cliPath: config.cli?.path
-            })
+            const result = await runVtCommand(["status", "--json"])
 
             // Clean up the temporary directory
-            await cleanupTempDirectory(workspace.tempDir)
+            await cleanupTempDirectory(workspace.workspacePath!)
 
             if (result.success) {
               // Parse JSON output
@@ -254,7 +238,7 @@ export function registerFileTools(server: McpServer, config: Config) {
     async ({valId, path: filePath, type, content, branchId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path)
+      const cliAvailable = useCliIfAvailable && await getCliAvailability()
 
       if (cliAvailable) {
         try {
@@ -366,7 +350,7 @@ export function registerFileTools(server: McpServer, config: Config) {
     async ({valId, path: filePath, content, branchId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path)
+      const cliAvailable = useCliIfAvailable && await getCliAvailability()
 
       if (cliAvailable) {
         try {
@@ -450,7 +434,7 @@ export function registerFileTools(server: McpServer, config: Config) {
     async ({valId, path: filePath, recursive, branchId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path)
+      const cliAvailable = useCliIfAvailable && await getCliAvailability()
 
       if (cliAvailable) {
         try {
