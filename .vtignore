@@ -1,0 +1,17 @@
+.git
+.vscode
+.cursorrules
+.DS_Store
+node_modules
+vendor
+taskNotes/
+README.md
+deno.lock
+CHANGELOG.md
+LICENSE
+mcp-documentation.md
+mcp.txt
+docs/
+build/
+valTownApi.json
+valtownAPIv2.json

@@ -1,8 +1,14 @@
 {
-  "version": "4",
+  "version": "5",
   "specifiers": {
+    "jsr:@std/path@*": "1.0.9",
     "npm:@modelcontextprotocol/sdk@*": "1.7.0_express@5.0.1_zod@3.24.2",
     "npm:zod@*": "3.24.2"
+  },
+  "jsr": {
+    "@std/path@1.0.9": {
+      "integrity": "260a49f11edd3db93dd38350bf9cd1b4d1366afa98e81b86167b4e3dd750129e"
+    }
   },
   "npm": {
     "@modelcontextprotocol/sdk@1.7.0_express@5.0.1_zod@3.24.2": {

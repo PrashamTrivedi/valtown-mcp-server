@@ -10,14 +10,22 @@ import {registerBlobTools} from "./tools/blobTools.ts"
 import {registerCliTools} from "./tools/cliTools.ts"
 import {registerPrompts} from "./prompts/promptsTools.ts"
 
-export async function registerTools(server: McpServer, config: Config) {
-    registerUserTools(server, config)
-    registerValTools(server, config)  // Now handles vals (formerly projects)
-    registerBranchTools(server, config)
-    registerFileTools(server, config)
-    registerSqliteTools(server, config)
-    registerBlobTools(server, config)
-    registerCliTools(server, config)  // Register CLI-specific tools
+export async function registerTools(
+  server: McpServer,
+  config: Config,
+  options?: { excludeCli?: boolean },
+) {
+  registerUserTools(server, config);
+  registerValTools(server, config); // Now handles vals (formerly projects)
+  registerBranchTools(server, config);
+  registerFileTools(server, config);
+  registerSqliteTools(server, config);
+  registerBlobTools(server, config);
+
+  // Conditionally register CLI tools
+  if (!options?.excludeCli) {
+    registerCliTools(server, config); // Register CLI-specific tools
+  }
 }
 
 export function registerPromptsTools(server: McpServer, config: Config) {
