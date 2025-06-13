@@ -7,6 +7,7 @@ import {registerBranchTools} from "./tools/branchTools.ts"
 import {registerFileTools} from "./tools/fileTools.ts"
 import {registerSqliteTools} from "./tools/sqliteTools.ts"
 import {registerBlobTools} from "./tools/blobTools.ts"
+import {registerCliTools} from "./tools/cliTools.ts"
 import {registerPrompts} from "./prompts/promptsTools.ts"
 
 export async function registerTools(server: McpServer, config: Config) {
@@ -16,6 +17,7 @@ export async function registerTools(server: McpServer, config: Config) {
     registerFileTools(server, config)
     registerSqliteTools(server, config)
     registerBlobTools(server, config)
+    registerCliTools(server, config)  // Register CLI-specific tools
 }
 
 export function registerPromptsTools(server: McpServer, config: Config) {

@@ -15,9 +15,11 @@ export function registerPrompts(server: McpServer, _config: Config) {
     async ({request}) => {
       try {
         const promptPath = _config.prompts?.valleyPath || _config.prompts?.defaultValleyPath
-        const promptContent = Deno.readTextFileSync(promptPath ?? `${import.meta.dirname}/valley.txt`)
+        const useCliIfAvailable = _config.cli?.preferCli ?? false
+        const cliAvailable = useCliIfAvailable && await getCliAvailability(_config.cli?.path)
+        const defaultPromptPath = `${import.meta.dirname}/prompts/${cliAvailable ? "valley.txt" : "valley_local.txt"}`
+        const promptContent = Deno.readTextFileSync(promptPath ?? defaultPromptPath).trim() // Moved .trim() to the same line
 
-          .trim()
         console.error({promptContent})
         return {
           messages: [
@@ -25,9 +27,7 @@ export function registerPrompts(server: McpServer, _config: Config) {
               role: "user",
               content: {
                 type: "text",
-                text: `
-                ${promptContent.trim()}\n\n
-                <UserRequest> ${request} </UserRequest>`
+                text: `${promptContent.trim()}\n\n<UserRequest> ${request} </UserRequest>`
               }
             }
           ]

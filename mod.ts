@@ -4,7 +4,7 @@ import {registerPromptsTools, registerTools} from "./registerTools.ts"
 import {loadConfig} from "./config.ts"
 
 // Load configuration
-const config = loadConfig()
+const config = await loadConfig()
 
 // Create server instance
 const server = new McpServer({

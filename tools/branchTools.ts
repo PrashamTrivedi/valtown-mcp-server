@@ -2,6 +2,7 @@ import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
+import {getCliAvailability, runVtCommand, parseCliJsonOutput, prepareValWorkspace, cleanupTempDirectory} from "../lib/vtCli.ts"
 import {z} from "zod"
 
 export function registerBranchTools(server: McpServer, config: Config) {
@@ -15,6 +16,50 @@ export function registerBranchTools(server: McpServer, config: Config) {
       offset: z.number().int().min(0).default(0).describe("Number of items to skip for pagination"),
     },
     async ({valId, limit, offset}) => {
+      // Check for CLI preference
+      const useCliIfAvailable = config.cli?.preferCli ?? false;
+      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+
+      if (cliAvailable) {
+        try {
+          // The CLI branch command requires working in a Val directory
+          console.log(`Using CLI to list branches for val: ${valId}`);
+          
+          // Prepare a workspace with the val cloned
+          const workspace = await prepareValWorkspace(valId);
+          
+          if (workspace.success && workspace.tempDir) {
+            // Run the branch command in the workspace
+            const result = await runVtCommand(["branch", "--json"], {
+              workingDir: workspace.tempDir,
+              suppressErrors: true,
+              cliPath: config.cli?.path
+            });
+            
+            // Clean up the temporary directory
+            await cleanupTempDirectory(workspace.tempDir);
+            
+            if (result.success) {
+              // Parse JSON output
+              const parsedOutput = parseCliJsonOutput(result.output);
+              if (parsedOutput) {
+                // Apply limit and offset manually if needed
+                return {
+                  content: [{type: "text", text: JSON.stringify(parsedOutput, null, 2)}],
+                };
+              }
+            }
+          }
+          
+          console.error(`CLI error when listing branches, falling back to API: ${workspace.error || "Unknown error"}`);
+          // Fall back to API on error
+        } catch (error) {
+          console.error("CLI error, falling back to API:", getErrorMessage(error));
+          // Fall back to API on error
+        }
+      }
+
+      // API implementation (original code)
       try {
         const data = await callValTownApi(
           config,
@@ -70,6 +115,66 @@ export function registerBranchTools(server: McpServer, config: Config) {
       branchId: z.string().optional().describe("ID of branch to fork from (optional)"),
     },
     async ({valId, name, branchId}) => {
+      // Check for CLI preference
+      const useCliIfAvailable = config.cli?.preferCli ?? false;
+      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+
+      if (cliAvailable) {
+        try {
+          // The CLI checkout -b command requires working in a Val directory
+          console.log(`Using CLI to create branch '${name}' for val: ${valId}`);
+          
+          // Prepare a workspace with the val cloned
+          const workspace = await prepareValWorkspace(valId);
+          
+          if (workspace.success && workspace.tempDir) {
+            // If a source branch is specified, checkout that branch first
+            if (branchId) {
+              const checkoutResult = await runVtCommand(["checkout", branchId], {
+                workingDir: workspace.tempDir,
+                suppressErrors: true,
+                cliPath: config.cli?.path
+              });
+              
+              if (!checkoutResult.success) {
+                console.error(`Failed to checkout source branch: ${checkoutResult.error}`);
+                await cleanupTempDirectory(workspace.tempDir);
+                // Fall back to API
+                console.error("CLI error when checking out source branch, falling back to API");
+                throw new Error("Failed to checkout source branch");
+              }
+            }
+            
+            // Create the new branch
+            const result = await runVtCommand(["checkout", "-b", name, "--json"], {
+              workingDir: workspace.tempDir,
+              suppressErrors: true,
+              cliPath: config.cli?.path
+            });
+            
+            // Clean up the temporary directory
+            await cleanupTempDirectory(workspace.tempDir);
+            
+            if (result.success) {
+              // Parse JSON output
+              const parsedOutput = parseCliJsonOutput(result.output);
+              if (parsedOutput) {
+                return {
+                  content: [{type: "text", text: JSON.stringify(parsedOutput, null, 2)}],
+                };
+              }
+            }
+          }
+          
+          console.error(`CLI error when creating branch, falling back to API: ${workspace.error || "Unknown error"}`);
+          // Fall back to API on error
+        } catch (error) {
+          console.error("CLI error, falling back to API:", getErrorMessage(error));
+          // Fall back to API on error
+        }
+      }
+
+      // API implementation (original code)
       try {
         const requestBody = {
           name,
@@ -107,6 +212,45 @@ export function registerBranchTools(server: McpServer, config: Config) {
       branchId: z.string().describe("ID of the branch to delete"),
     },
     async ({valId, branchId}) => {
+      // Check for CLI preference
+      const useCliIfAvailable = config.cli?.preferCli ?? false;
+      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+
+      if (cliAvailable) {
+        try {
+          // The CLI branch -D command requires working in a Val directory
+          console.log(`Using CLI to delete branch '${branchId}' from val: ${valId}`);
+          
+          // Prepare a workspace with the val cloned
+          const workspace = await prepareValWorkspace(valId);
+          
+          if (workspace.success && workspace.tempDir) {
+            // Delete the branch
+            const result = await runVtCommand(["branch", "-D", branchId, "--json"], {
+              workingDir: workspace.tempDir,
+              suppressErrors: true,
+              cliPath: config.cli?.path
+            });
+            
+            // Clean up the temporary directory
+            await cleanupTempDirectory(workspace.tempDir);
+            
+            if (result.success) {
+              return {
+                content: [{type: "text", text: `Branch ${branchId} deleted successfully.`}],
+              };
+            }
+          }
+          
+          console.error(`CLI error when deleting branch, falling back to API: ${workspace.error || "Unknown error"}`);
+          // Fall back to API on error
+        } catch (error) {
+          console.error("CLI error, falling back to API:", getErrorMessage(error));
+          // Fall back to API on error
+        }
+      }
+
+      // API implementation (original code)
       try {
         await callValTownApi(
           config,
