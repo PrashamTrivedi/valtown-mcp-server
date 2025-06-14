@@ -1,6 +1,6 @@
 
 export interface Config {
-    apiToken: string
+    apiToken: string | null
     apiBase: string
     cli?: {
         preferCli: boolean

@@ -1,13 +1,13 @@
 /**
  * CLI-specific tools for ValTown enhanced capabilities
  */
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {z} from "zod";
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "npm:zod";
 import {Config} from "../lib/types.ts";
 import {getCliAvailability, runVtCommand, parseCliJsonOutput, prepareValWorkspace, cleanupTempDirectory} from "../lib/vtCli.ts";
 import {getErrorMessage} from "../lib/errorUtils.ts";
 
-export function registerCliTools(server: McpServer, config: Config) {
+export function registerCliTools(server: McpServer, _config: Config) {
   // Watch files in a project for real-time updates
   server.tool(
     "watch-files",
@@ -229,7 +229,7 @@ export function registerCliTools(server: McpServer, config: Config) {
     },
     async ({valId, branchId}) => {
       // Check for CLI availability (required for this tool)
-      const cliAvailable = await getCliAvailability(config.cli?.path);
+      const cliAvailable = await getCliAvailability();
       
       if (!cliAvailable) {
         return {
@@ -243,7 +243,7 @@ export function registerCliTools(server: McpServer, config: Config) {
         console.log(`Using CLI to watch val: ${valId}`);
         const workspace = await prepareValWorkspace(valId);
         
-        if (!workspace.success || !workspace.tempDir) {
+        if (!workspace.success || !workspace.workspacePath) {
           return {
             content: [{type: "text", text: `Error preparing workspace: ${workspace.error || "Unknown error"}`}],
             isError: true,
@@ -252,14 +252,10 @@ export function registerCliTools(server: McpServer, config: Config) {
         
         // If a branch is specified, checkout that branch
         if (branchId) {
-          const checkoutResult = await runVtCommand(["checkout", branchId], {
-            workingDir: workspace.tempDir,
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const checkoutResult = await runVtCommand(["checkout", branchId]);
           
           if (!checkoutResult.success) {
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             return {
               content: [{type: "text", text: `Error checking out branch: ${checkoutResult.error}`}],
               isError: true,
@@ -270,17 +266,13 @@ export function registerCliTools(server: McpServer, config: Config) {
         // Start watching the val
         // Note: In a real implementation, this would need to be a long-running process
         // This example just initiates the watch command and reports success
-        const watchResult = await runVtCommand(["watch", "--json"], {
-          workingDir: workspace.tempDir,
-          suppressErrors: true,
-          cliPath: config.cli?.path
-        });
+        const watchResult = await runVtCommand(["watch", "--json"]);
         
         // Note: In a real implementation, we would keep the watch process running
         // and handle cleanup when appropriate. For this example, we'll just report success
         
         // Clean up workspace (in a real implementation, this would happen later)
-        await cleanupTempDirectory(workspace.tempDir);
+        await cleanupTempDirectory(workspace.workspacePath);
         
         if (!watchResult.success) {
           return {
@@ -313,7 +305,7 @@ export function registerCliTools(server: McpServer, config: Config) {
     },
     async ({valId, branchId}) => {
       // Check for CLI availability (required for this tool)
-      const cliAvailable = await getCliAvailability(config.cli?.path);
+      const cliAvailable = await getCliAvailability();
       
       if (!cliAvailable) {
         return {
@@ -327,7 +319,7 @@ export function registerCliTools(server: McpServer, config: Config) {
         console.log(`Using CLI to pull latest changes for val: ${valId}`);
         const workspace = await prepareValWorkspace(valId);
         
-        if (!workspace.success || !workspace.tempDir) {
+        if (!workspace.success || !workspace.workspacePath) {
           return {
             content: [{type: "text", text: `Error preparing workspace: ${workspace.error || "Unknown error"}`}],
             isError: true,
@@ -336,14 +328,10 @@ export function registerCliTools(server: McpServer, config: Config) {
         
         // If a branch is specified, checkout that branch
         if (branchId) {
-          const checkoutResult = await runVtCommand(["checkout", branchId], {
-            workingDir: workspace.tempDir,
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const checkoutResult = await runVtCommand(["checkout", branchId]);
           
           if (!checkoutResult.success) {
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             return {
               content: [{type: "text", text: `Error checking out branch: ${checkoutResult.error}`}],
               isError: true,
@@ -352,14 +340,10 @@ export function registerCliTools(server: McpServer, config: Config) {
         }
         
         // Pull latest changes
-        const pullResult = await runVtCommand(["pull", "--json"], {
-          workingDir: workspace.tempDir,
-          suppressErrors: true,
-          cliPath: config.cli?.path
-        });
+        const pullResult = await runVtCommand(["pull", "--json"]);
         
         // Clean up workspace
-        await cleanupTempDirectory(workspace.tempDir);
+        await cleanupTempDirectory(workspace.workspacePath);
         
         if (!pullResult.success) {
           return {
@@ -399,7 +383,7 @@ export function registerCliTools(server: McpServer, config: Config) {
     },
     async ({valId}) => {
       // Check for CLI availability (required for this tool)
-      const cliAvailable = await getCliAvailability(config.cli?.path);
+      const cliAvailable = await getCliAvailability();
       
       if (!cliAvailable) {
         return {
@@ -415,10 +399,7 @@ export function registerCliTools(server: McpServer, config: Config) {
         console.log(`Using CLI to get browse URL for val: ${valId}`);
         
         // Run the command to get the URL
-        const browseResult = await runVtCommand(["browse", valId, "--dry-run", "--json"], {
-          suppressErrors: true,
-          cliPath: config.cli?.path
-        });
+        const browseResult = await runVtCommand(["browse", valId, "--dry-run", "--json"]);
         
         if (!browseResult.success) {
           return {
@@ -460,7 +441,7 @@ export function registerCliTools(server: McpServer, config: Config) {
     },
     async ({sourceValUri, newValName, privacy}) => {
       // Check for CLI availability (required for this tool)
-      const cliAvailable = await getCliAvailability(config.cli?.path);
+      const cliAvailable = await getCliAvailability();
       
       if (!cliAvailable) {
         return {
@@ -481,10 +462,7 @@ export function registerCliTools(server: McpServer, config: Config) {
         }
         
         // Run the remix command
-        const remixResult = await runVtCommand(args, {
-          suppressErrors: true,
-          cliPath: config.cli?.path
-        });
+        const remixResult = await runVtCommand(args);
         
         if (!remixResult.success) {
           return {
@@ -525,7 +503,7 @@ export function registerCliTools(server: McpServer, config: Config) {
     },
     async ({valId, branchId}) => {
       // Check for CLI availability (required for this tool)
-      const cliAvailable = await getCliAvailability(config.cli?.path);
+      const cliAvailable = await getCliAvailability();
       
       if (!cliAvailable) {
         return {
@@ -539,7 +517,7 @@ export function registerCliTools(server: McpServer, config: Config) {
         console.log(`Using CLI to get status for val: ${valId}`);
         const workspace = await prepareValWorkspace(valId);
         
-        if (!workspace.success || !workspace.tempDir) {
+        if (!workspace.success || !workspace.workspacePath) {
           return {
             content: [{type: "text", text: `Error preparing workspace: ${workspace.error || "Unknown error"}`}],
             isError: true,
@@ -548,14 +526,10 @@ export function registerCliTools(server: McpServer, config: Config) {
         
         // If a branch is specified, checkout that branch
         if (branchId) {
-          const checkoutResult = await runVtCommand(["checkout", branchId], {
-            workingDir: workspace.tempDir,
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const checkoutResult = await runVtCommand(["checkout", branchId]);
           
           if (!checkoutResult.success) {
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             return {
               content: [{type: "text", text: `Error checking out branch: ${checkoutResult.error}`}],
               isError: true,
@@ -564,14 +538,10 @@ export function registerCliTools(server: McpServer, config: Config) {
         }
         
         // Get status
-        const statusResult = await runVtCommand(["status", "--json"], {
-          workingDir: workspace.tempDir,
-          suppressErrors: true,
-          cliPath: config.cli?.path
-        });
+        const statusResult = await runVtCommand(["status", "--json"]);
         
         // Clean up workspace
-        await cleanupTempDirectory(workspace.tempDir);
+        await cleanupTempDirectory(workspace.workspacePath);
         
         if (!statusResult.success) {
           return {

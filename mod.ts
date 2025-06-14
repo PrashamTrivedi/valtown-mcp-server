@@ -1,5 +1,5 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
-import {StdioServerTransport} from "@modelcontextprotocol/sdk/server/stdio.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
+import {StdioServerTransport} from "npm:@modelcontextprotocol/sdk/server/stdio.js"
 import {registerPromptsTools, registerTools} from "./registerTools.ts"
 import {loadConfig} from "./config.ts"
 

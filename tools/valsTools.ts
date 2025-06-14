@@ -1,9 +1,9 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
 import {getCliAvailability, runVtCommand, parseCliJsonOutput} from "../lib/vtCli.ts"
-import {z} from "zod"
+import {z} from "npm:zod"
 
 export function registerValTools(server: McpServer, config: Config) {
   // Get val by username and val name
@@ -17,17 +17,14 @@ export function registerValTools(server: McpServer, config: Config) {
     async ({username, valName}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
       const valReference = `${username}/${valName}`;
 
       if (cliAvailable) {
         try {
           // Use CLI implementation with the clone command and --json flag
           console.log(`Using CLI to get val: ${valReference}`);
-          const result = await runVtCommand(["clone", valReference, "--json"], {
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const result = await runVtCommand(["clone", valReference, "--json"]);
           
           if (result.success) {
             // Parse JSON output
@@ -106,7 +103,7 @@ export function registerValTools(server: McpServer, config: Config) {
     async ({name, description, privacy}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -125,10 +122,7 @@ export function registerValTools(server: McpServer, config: Config) {
             cliArgs.push("--description", description);
           }
           
-          const result = await runVtCommand(cliArgs, {
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const result = await runVtCommand(cliArgs);
           
           if (result.success) {
             // Parse JSON output
@@ -188,7 +182,7 @@ export function registerValTools(server: McpServer, config: Config) {
     async ({valId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -242,7 +236,7 @@ export function registerValTools(server: McpServer, config: Config) {
     async ({limit, offset}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -253,10 +247,7 @@ export function registerValTools(server: McpServer, config: Config) {
           // Note: the CLI may not support limit and offset params
           // We could add support for --limit and --offset if the CLI adds these options
           
-          const result = await runVtCommand(cliArgs, {
-            suppressErrors: true,
-            cliPath: config.cli?.path
-          });
+          const result = await runVtCommand(cliArgs);
           
           if (result.success) {
             // Parse JSON output

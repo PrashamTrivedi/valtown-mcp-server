@@ -1,9 +1,9 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
 import {getCliAvailability, runVtCommand, parseCliJsonOutput, prepareValWorkspace, cleanupTempDirectory} from "../lib/vtCli.ts"
-import {z} from "zod"
+import {z} from "npm:zod"
 
 export function registerBranchTools(server: McpServer, config: Config) {
   // List all branches in a val
@@ -18,7 +18,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
     async ({valId, limit, offset}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -28,16 +28,12 @@ export function registerBranchTools(server: McpServer, config: Config) {
           // Prepare a workspace with the val cloned
           const workspace = await prepareValWorkspace(valId);
           
-          if (workspace.success && workspace.tempDir) {
+          if (workspace.success && workspace.workspacePath) {
             // Run the branch command in the workspace
-            const result = await runVtCommand(["branch", "--json"], {
-              workingDir: workspace.tempDir,
-              suppressErrors: true,
-              cliPath: config.cli?.path
-            });
+            const result = await runVtCommand(["branch", "--json"]);
             
             // Clean up the temporary directory
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             
             if (result.success) {
               // Parse JSON output
@@ -117,7 +113,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
     async ({valId, name, branchId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -127,18 +123,14 @@ export function registerBranchTools(server: McpServer, config: Config) {
           // Prepare a workspace with the val cloned
           const workspace = await prepareValWorkspace(valId);
           
-          if (workspace.success && workspace.tempDir) {
+          if (workspace.success && workspace.workspacePath) {
             // If a source branch is specified, checkout that branch first
             if (branchId) {
-              const checkoutResult = await runVtCommand(["checkout", branchId], {
-                workingDir: workspace.tempDir,
-                suppressErrors: true,
-                cliPath: config.cli?.path
-              });
+              const checkoutResult = await runVtCommand(["checkout", branchId]);
               
               if (!checkoutResult.success) {
                 console.error(`Failed to checkout source branch: ${checkoutResult.error}`);
-                await cleanupTempDirectory(workspace.tempDir);
+                await cleanupTempDirectory(workspace.workspacePath);
                 // Fall back to API
                 console.error("CLI error when checking out source branch, falling back to API");
                 throw new Error("Failed to checkout source branch");
@@ -146,14 +138,10 @@ export function registerBranchTools(server: McpServer, config: Config) {
             }
             
             // Create the new branch
-            const result = await runVtCommand(["checkout", "-b", name, "--json"], {
-              workingDir: workspace.tempDir,
-              suppressErrors: true,
-              cliPath: config.cli?.path
-            });
+            const result = await runVtCommand(["checkout", "-b", name, "--json"]);
             
             // Clean up the temporary directory
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             
             if (result.success) {
               // Parse JSON output
@@ -214,7 +202,7 @@ export function registerBranchTools(server: McpServer, config: Config) {
     async ({valId, branchId}) => {
       // Check for CLI preference
       const useCliIfAvailable = config.cli?.preferCli ?? false;
-      const cliAvailable = useCliIfAvailable && await getCliAvailability(config.cli?.path);
+      const cliAvailable = useCliIfAvailable && await getCliAvailability();
 
       if (cliAvailable) {
         try {
@@ -224,16 +212,12 @@ export function registerBranchTools(server: McpServer, config: Config) {
           // Prepare a workspace with the val cloned
           const workspace = await prepareValWorkspace(valId);
           
-          if (workspace.success && workspace.tempDir) {
+          if (workspace.success && workspace.workspacePath) {
             // Delete the branch
-            const result = await runVtCommand(["branch", "-D", branchId, "--json"], {
-              workingDir: workspace.tempDir,
-              suppressErrors: true,
-              cliPath: config.cli?.path
-            });
+            const result = await runVtCommand(["branch", "-D", branchId, "--json"]);
             
             // Clean up the temporary directory
-            await cleanupTempDirectory(workspace.tempDir);
+            await cleanupTempDirectory(workspace.workspacePath);
             
             if (result.success) {
               return {

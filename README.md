@@ -14,7 +14,7 @@ allows AI assistants to execute code in the ValTown environment.
 ### Option 1: Use pre-built binaries
 
 Download the appropriate binary for your platform from the
-[latest release](https://github.com/YOUR_USERNAME/valtown-mcp-server/releases/latest):
+[latest release](https://github.com/PrashamTrivedi/valtown-mcp-server/releases/latest):
 
 - Linux: `valtown-mcp-linux`
 - Windows: `valtown-mcp-windows.exe`
@@ -50,6 +50,30 @@ You can obtain a ValTown API token from your
 [ValTown account settings](https://www.val.town/settings).
 
 ## Usage with MCP Clients
+
+### Online Connection (Hosted on ValTown)
+
+The easiest way to use this MCP server is to connect to the hosted version running on ValTown:
+
+```json
+{
+  "mcpServers": {
+    "valtown": {
+      "type": "streamable-http",
+      "url": "https://prashamtrivedi-valtown-mcp-server.val.run/mcp",
+      "headers": {
+        "x-val-town-token": "YOUR_VAL_TOWN_TOKEN_HERE"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_VAL_TOWN_TOKEN_HERE` with your actual ValTown API token.
+
+### Local Installation
+
+If you prefer to run the server locally, you can use the following methods:
 
 ### Claude Desktop
 

@@ -19,6 +19,10 @@ export async function callValTownApi(
 
     const url = `${config.apiBase}${apiPath}`
 
+    if (!config.apiToken) {
+        throw new Error("API token is required for ValTown API calls");
+    }
+
     const headers: HeadersInit = {
         'Authorization': `Bearer ${config.apiToken}`,
         'Content-Type': 'application/json',
