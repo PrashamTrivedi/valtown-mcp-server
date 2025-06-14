@@ -111,18 +111,5 @@ app.post("/", async (c) => {
   }
 })
 
-// Handle other methods
-app.all("/*", (c) => {
-  if (c.req.method === "OPTIONS") {
-    return new Response(null, {status: 200})
-  }
-  console.log({method: c.req.method})
-
-  return c.json({
-    jsonrpc: "2.0",
-    error: {code: -32000, method: c.req.method, message: "Method not allowed. Use GET for server info or POST for MCP requests."},
-    id: null
-  }, 405)
-})
 
 export default app.fetch
