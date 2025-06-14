@@ -10,7 +10,7 @@ import {registerBlobTools} from "./tools/blobTools.ts"
 import {registerCliTools} from "./tools/cliTools.ts"
 import {registerPrompts} from "./prompts/promptsTools.ts"
 
-export async function registerTools(
+export function registerTools(
   server: McpServer,
   config: Config,
   options?: { excludeCli?: boolean },

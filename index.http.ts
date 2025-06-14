@@ -37,7 +37,7 @@ app.get("/", (_c) => {
     },
     documentation: "https://github.com/your-repo/valtown-mcp-server"
   }
-  
+
   return new Response(JSON.stringify(responseData), {
     headers: {
       "Content-Type": "application/json",
@@ -120,6 +120,7 @@ app.all("/*", (c) => {
   if (c.req.method === "OPTIONS") {
     return new Response(null, {status: 200})
   }
+  console.log({method: c.req.method})
 
   return c.json({
     jsonrpc: "2.0",

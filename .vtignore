@@ -18,6 +18,5 @@ taskNotes
 valTownApi.json
 valtownAPIv2.json
 val-town-mcp-server
-prompts
 .claude
 mod.ts
