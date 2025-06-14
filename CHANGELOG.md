@@ -4,13 +4,27 @@
 
 ### Added
 
+- Added remote HTTP transport for ValTown deployment
+- Added GET endpoint for MCP server info
+- Added online connection method to README with hosted ValTown server
+  configuration
 - Added changelog documentation and guidelines
 - Added prompt files for Townie and OpenTownie templates with guidelines
 - Included prompt files in build tasks for all platforms
+- Added comprehensive CLAUDE.md with ValTown platform context and architecture overview
 
 ### Changed
 
-- Updated README with improved documentation for first-time visitors
+- Upgraded to V2 APIs with enhanced prompt system and branch management tools
+- Migrated from deno.json import map to direct npm imports
+- Updated README with improved documentation for first-time visitors and online
+  connection method
+- Updated CLI function calls to match interface signatures
+- Updated Config interface and fixed Deno.run API usage
+
+### Fixed
+
+- Fixed placeholder repository URLs in README.md and index.http.ts documentation links
 
 ## [v0.2]
 

@@ -35,7 +35,7 @@ app.get("/", (c) => {
       mcp: "POST / - MCP protocol requests (requires X-Val-Town-Token header)",
       info: "GET / - This endpoint"
     },
-    documentation: "https://github.com/your-repo/valtown-mcp-server"
+    documentation: "https://github.com/PrashamTrivedi/valtown-mcp-server"
   }
 
   return c.json(responseData)
@@ -43,7 +43,7 @@ app.get("/", (c) => {
 
 
 // Handle MCP requests
-app.post("/", async (c) => {
+app.post("/mcp", async (c) => {
   try {
     // Extract API token from headers
     const apiToken = c.req.header("X-Val-Town-Token") ||
