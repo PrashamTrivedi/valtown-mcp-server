@@ -25,7 +25,7 @@ app.use("/*", cors({
 
 // Handle GET requests - Server info
 app.get("/", (c) => {
-  return c.json({
+  const responseData = {
     name: "ValTown MCP Server",
     version: "1.0.0",
     description: "Model Context Protocol server for ValTown integration",
@@ -36,6 +36,13 @@ app.get("/", (c) => {
       info: "GET / - This endpoint"
     },
     documentation: "https://github.com/your-repo/valtown-mcp-server"
+  }
+  
+  return new Response(JSON.stringify(responseData), {
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    }
   })
 })
 
