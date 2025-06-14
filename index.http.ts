@@ -24,7 +24,7 @@ app.use("/*", cors({
 }))
 
 // Handle GET requests - Server info
-app.get("/", (c) => {
+app.get("/", (_c) => {
   const responseData = {
     name: "ValTown MCP Server",
     version: "1.0.0",
@@ -128,4 +128,4 @@ app.all("/*", (c) => {
   }, 405)
 })
 
-export default app
+export default app.fetch
