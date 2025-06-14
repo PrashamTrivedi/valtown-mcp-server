@@ -25,6 +25,9 @@
 ### Fixed
 
 - Fixed placeholder repository URLs in README.md and index.http.ts documentation links
+- Fixed security vulnerability: removed API token logging in HTTP requests
+- Fixed missing JSON parse error handling in HTTP MCP endpoint
+- Fixed information leakage in HTTP error responses
 
 ## [v0.2]
 

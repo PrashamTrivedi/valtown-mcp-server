@@ -60,8 +60,6 @@ app.post("/mcp", async (c) => {
     // Load remote configuration
     const config = await loadConfig(true)
     config.apiToken = apiToken
-
-    console.log({apiToken})
     // Convert Hono request to Node.js-style req/res
     const {req, res} = toReqRes(c.req.raw)
 
@@ -84,7 +82,21 @@ app.post("/mcp", async (c) => {
     await server.connect(transport)
 
     // Handle the MCP request using streamable transport
-    await transport.handleRequest(req, res, await c.req.json())
+    let requestBody
+    try {
+      requestBody = await c.req.json()
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        return c.json({
+          jsonrpc: "2.0",
+          error: {code: -32700, message: "Parse error"},
+          id: null
+        }, 400)
+      }
+      throw error
+    }
+    
+    await transport.handleRequest(req, res, requestBody)
 
     // Clean up on close
     res.on('close', () => {
@@ -103,8 +115,7 @@ app.post("/mcp", async (c) => {
       jsonrpc: "2.0",
       error: {
         code: -32603,
-        message: "Internal server error",
-        data: error instanceof Error ? error.message : String(error)
+        message: "Internal server error"
       },
       id: null,
     }, 500)
