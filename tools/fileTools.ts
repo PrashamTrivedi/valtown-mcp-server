@@ -1,10 +1,10 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
 import {getCliAvailability, runVtCommand, parseCliJsonOutput, prepareValWorkspace, cleanupTempDirectory} from "../lib/vtCli.ts"
 import * as path from "jsr:@std/path"
-import {z} from "zod"
+import {z} from "npm:zod"
 
 /**
  * Helper to perform file operations using the CLI

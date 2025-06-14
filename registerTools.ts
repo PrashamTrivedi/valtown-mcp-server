@@ -1,5 +1,5 @@
 // registerTools.ts
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "./lib/types.ts"
 import {registerUserTools} from "./tools/userTools.ts"
 import {registerValTools} from "./tools/valsTools.ts"

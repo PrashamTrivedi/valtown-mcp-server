@@ -1,8 +1,8 @@
 /**
  * CLI-specific tools for ValTown enhanced capabilities
  */
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js";
-import {z} from "zod";
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js";
+import {z} from "npm:zod";
 import {Config} from "../lib/types.ts";
 import {getCliAvailability, runVtCommand, parseCliJsonOutput, prepareValWorkspace, cleanupTempDirectory} from "../lib/vtCli.ts";
 import {getErrorMessage} from "../lib/errorUtils.ts";

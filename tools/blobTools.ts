@@ -1,5 +1,5 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
-import {z} from "zod"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
+import {z} from "npm:zod"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"

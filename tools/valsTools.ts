@@ -1,9 +1,9 @@
-import {McpServer} from "@modelcontextprotocol/sdk/server/mcp.js"
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
 import {Config} from "../lib/types.ts"
 import {callValTownApi} from "../lib/api.ts"
 import {getErrorMessage} from "../lib/errorUtils.ts"
 import {getCliAvailability, runVtCommand, parseCliJsonOutput} from "../lib/vtCli.ts"
-import {z} from "zod"
+import {z} from "npm:zod"
 
 export function registerValTools(server: McpServer, config: Config) {
   // Get val by username and val name

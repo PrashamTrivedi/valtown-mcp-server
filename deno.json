@@ -6,10 +6,5 @@
     "build:linux": "deno compile --output build/valtown-mcp-linux --include prompts/valley.txt --include prompts/valley_local.txt --target x86_64-unknown-linux-gnu --allow-net --allow-env --allow-read mod.ts",
     "build:windows": "deno compile --output build/valtown-mcp-windows.exe --include prompts/valley.txt --include prompts/valley_local.txt --target x86_64-pc-windows-msvc --allow-net --allow-env --allow-read mod.ts",
     "build:macos": "deno compile --output build/valtown-mcp-macos --include prompts/valley.txt --include prompts/valley_local.txt --target x86_64-apple-darwin --allow-net --allow-env --allow-read mod.ts"
-  },
-  "imports": {
-    "zod": "npm:zod",
-    "@modelcontextprotocol/sdk/server": "npm:@modelcontextprotocol/sdk/server",
-    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk"
   }
 }
