@@ -24,7 +24,7 @@ app.use("/*", cors({
 }))
 
 // Handle GET requests - Server info
-app.get("/", (_c) => {
+app.get("/", (c) => {
   const responseData = {
     name: "ValTown MCP Server",
     version: "1.0.0",
@@ -38,13 +38,9 @@ app.get("/", (_c) => {
     documentation: "https://github.com/your-repo/valtown-mcp-server"
   }
 
-  return new Response(JSON.stringify(responseData), {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    }
-  })
+  return c.json(responseData)
 })
+
 
 // Handle MCP requests
 app.post("/", async (c) => {
@@ -124,7 +120,7 @@ app.all("/*", (c) => {
 
   return c.json({
     jsonrpc: "2.0",
-    error: {code: -32000, message: "Method not allowed. Use GET for server info or POST for MCP requests."},
+    error: {code: -32000, method: c.req.method, message: "Method not allowed. Use GET for server info or POST for MCP requests."},
     id: null
   }, 405)
 })
