@@ -6,101 +6,119 @@
  * header-based authentication with Hono and StreamableHTTPServerTransport.
  */
 
-import { McpServer } from "npm:@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "npm:@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { Hono } from "npm:hono";
-import { cors } from "npm:hono/cors";
-import { toFetchResponse, toReqRes } from "npm:fetch-to-node";
-import { registerPromptsTools, registerTools } from "./registerTools.ts";
-import { loadConfig } from "./config.ts";
+import {McpServer} from "npm:@modelcontextprotocol/sdk/server/mcp.js"
+import {StreamableHTTPServerTransport} from "npm:@modelcontextprotocol/sdk/server/streamableHttp.js"
+import {Hono} from "npm:hono"
+import {cors} from "npm:hono/cors"
+import {toFetchResponse, toReqRes} from "npm:fetch-to-node"
+import {registerPromptsTools, registerTools} from "./registerTools.ts"
+import {loadConfig} from "./config.ts"
 
-const app = new Hono();
+const app = new Hono()
 
 // Add CORS middleware
 app.use("/*", cors({
   origin: "*",
-  allowMethods: ["POST", "OPTIONS"],
+  allowMethods: ["GET", "POST", "OPTIONS"],
   allowHeaders: ["Content-Type", "Authorization", "Mcp-Session-Id", "X-Val-Town-Token"],
-}));
+}))
+
+// Handle GET requests - Server info
+app.get("/", (c) => {
+  return c.json({
+    name: "ValTown MCP Server",
+    version: "1.0.0",
+    description: "Model Context Protocol server for ValTown integration",
+    status: "active",
+    message: "This is an MCP server. Configuration endpoint coming soon...",
+    endpoints: {
+      mcp: "POST / - MCP protocol requests (requires X-Val-Town-Token header)",
+      info: "GET / - This endpoint"
+    },
+    documentation: "https://github.com/your-repo/valtown-mcp-server"
+  })
+})
 
 // Handle MCP requests
 app.post("/", async (c) => {
   try {
     // Extract API token from headers
     const apiToken = c.req.header("X-Val-Town-Token") ||
-      c.req.header("Authorization")?.replace("Bearer ", "");
+      c.req.header("Authorization")?.replace("Bearer ", "")
 
     if (!apiToken) {
-      return c.json({ 
+      return c.json({
         jsonrpc: "2.0",
-        error: { code: -32000, message: "Missing API token in X-Val-Town-Token header or Authorization header" },
-        id: null 
-      }, 401);
+        error: {code: -32000, message: "Missing API token in X-Val-Town-Token header or Authorization header"},
+        id: null
+      }, 401)
     }
 
     // Load remote configuration
-    const config = await loadConfig(true);
-    config.apiToken = apiToken;
+    const config = await loadConfig(true)
+    config.apiToken = apiToken
 
+    console.log({apiToken})
     // Convert Hono request to Node.js-style req/res
-    const { req, res } = toReqRes(c.req.raw);
+    const {req, res} = toReqRes(c.req.raw)
 
     // Create streamable HTTP transport
     const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => crypto.randomUUID(),
-    });
+      sessionIdGenerator: undefined,
+    })
 
     // Create MCP server instance
     const server = new McpServer({
       name: "val-town-remote",
       version: "1.0.0",
-    });
+    })
 
     // Register tools (exclude CLI-dependent tools)
-    await registerTools(server, config, { excludeCli: true });
-    registerPromptsTools(server, config);
+    registerTools(server, config, {excludeCli: true})
+    registerPromptsTools(server, config)
 
     // Connect server to transport
-    await server.connect(transport);
+    await server.connect(transport)
 
     // Handle the MCP request using streamable transport
-    await transport.handleRequest(req, res, await c.req.json());
+    await transport.handleRequest(req, res, await c.req.json())
 
     // Clean up on close
     res.on('close', () => {
-      transport.close();
-      server.close();
-    });
+      console.log('closing request')
+      transport.close()
+      server.close()
+    })
 
     // Convert Node.js response back to Fetch response
-    return toFetchResponse(res);
+    return toFetchResponse(res)
 
   } catch (error) {
-    console.error("Error handling MCP request:", error);
-    
-    return c.json({ 
+    console.error("Error handling MCP request:", error)
+
+    return c.json({
       jsonrpc: "2.0",
-      error: { 
-        code: -32603, 
+      error: {
+        code: -32603,
         message: "Internal server error",
         data: error instanceof Error ? error.message : String(error)
       },
       id: null,
-    }, 500);
+    }, 500)
   }
-});
+})
 
-// Handle non-POST methods
+// Handle other methods
 app.all("/*", (c) => {
   if (c.req.method === "OPTIONS") {
-    return new Response(null, { status: 200 });
+    return new Response(null, {status: 200})
   }
-  
+
   return c.json({
     jsonrpc: "2.0",
-    error: { code: -32000, message: "Method not allowed. Use POST for MCP requests." },
+    error: {code: -32000, message: "Method not allowed. Use GET for server info or POST for MCP requests."},
     id: null
-  }, 405);
-});
+  }, 405)
+})
 
-export default app;
+export default app
