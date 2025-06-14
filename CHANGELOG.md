@@ -2,12 +2,13 @@
 
 ## [Unreleased]
 
+## [v0.8] - 2025-06-14
+
 ### Added
 
 - Added remote HTTP transport for ValTown deployment
-- Added GET endpoint for MCP server info
-- Added online connection method to README with hosted ValTown server
-  configuration
+- Added GET endpoint for MCP server info  
+- Added online connection method to README with hosted ValTown server configuration
 - Added changelog documentation and guidelines
 - Added prompt files for Townie and OpenTownie templates with guidelines
 - Included prompt files in build tasks for all platforms
@@ -17,8 +18,7 @@
 
 - Upgraded to V2 APIs with enhanced prompt system and branch management tools
 - Migrated from deno.json import map to direct npm imports
-- Updated README with improved documentation for first-time visitors and online
-  connection method
+- Updated README with improved documentation for first-time visitors and online connection method
 - Updated CLI function calls to match interface signatures
 - Updated Config interface and fixed Deno.run API usage
 
@@ -28,6 +28,12 @@
 - Fixed security vulnerability: removed API token logging in HTTP requests
 - Fixed missing JSON parse error handling in HTTP MCP endpoint
 - Fixed information leakage in HTTP error responses
+
+### Security
+
+- Removed API token logging to prevent credential exposure
+- Added proper JSON parsing error handling with standard JSON-RPC error codes
+- Sanitized error responses to prevent information leakage
 
 ## [v0.2]
 
