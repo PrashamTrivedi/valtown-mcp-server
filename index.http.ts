@@ -95,7 +95,7 @@ app.post("/mcp", async (c) => {
       }
       throw error
     }
-    
+
     await transport.handleRequest(req, res, requestBody)
 
     // Clean up on close
@@ -122,5 +122,12 @@ app.post("/mcp", async (c) => {
   }
 })
 
+app.get("/mcp", (c) => {
+  console.log("Received GET MCP request - not supported in stateless mode")
+  return c.json({
+    jsonrpc: "2.0",
+    id: null,
+  }, 200)
+})
 
 export default app.fetch
