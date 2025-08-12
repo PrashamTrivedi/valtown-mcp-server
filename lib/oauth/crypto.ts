@@ -1,4 +1,5 @@
 import { OAuthConfig } from "../types.ts";
+import { getCryptoKeyPair } from "../../config.ts";
 
 export function generateRandomString(length: number = 32): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -47,7 +48,17 @@ export async function generateJWT(payload: any, config: OAuthConfig): Promise<st
   const payloadB64 = btoa(JSON.stringify(jwtPayload));
   const unsignedToken = `${headerB64}.${payloadB64}`;
 
-  const privateKey = await importPrivateKey(config.jwtPrivateKey);
+  // Use cached CryptoKey objects for auto-generated keys, or import for user-provided keys
+  const cryptoKeys = getCryptoKeyPair();
+  let privateKey: CryptoKey;
+  
+  if (cryptoKeys && config.jwtPrivateKey.startsWith('{')) {
+    // Auto-generated keys - use cached CryptoKey
+    privateKey = cryptoKeys.privateKey;
+  } else {
+    // User-provided keys - import them
+    privateKey = await importPrivateKey(config.jwtPrivateKey);
+  }
   const signature = await crypto.subtle.sign(
     'RSASSA-PKCS1-v1_5',
     privateKey,
@@ -92,48 +103,82 @@ export async function verifyJWT(token: string, config: OAuthConfig): Promise<any
   return payload;
 }
 
-async function importPrivateKey(privateKeyPem: string): Promise<CryptoKey> {
-  const pemHeader = '-----BEGIN PRIVATE KEY-----';
-  const pemFooter = '-----END PRIVATE KEY-----';
-  const pemContents = privateKeyPem
-    .replace(pemHeader, '')
-    .replace(pemFooter, '')
-    .replace(/\s/g, '');
-  
-  const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
-  
-  return await crypto.subtle.importKey(
-    'pkcs8',
-    binaryDer,
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: 'SHA-256',
-    },
-    false,
-    ['sign']
-  );
+async function importPrivateKey(privateKey: string): Promise<CryptoKey> {
+  // Handle JWK format (auto-generated keys) vs PEM format (user-provided)
+  if (privateKey.startsWith('{')) {
+    // JWK format - parse and import
+    const jwk = JSON.parse(privateKey);
+    return await crypto.subtle.importKey(
+      'jwk',
+      jwk,
+      {
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
+      },
+      false,
+      ['sign']
+    );
+  } else {
+    // PEM format - existing logic
+    const pemHeader = '-----BEGIN PRIVATE KEY-----';
+    const pemFooter = '-----END PRIVATE KEY-----';
+    const pemContents = privateKey
+      .replace(pemHeader, '')
+      .replace(pemFooter, '')
+      .replace(/\s/g, '');
+    
+    const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+    
+    return await crypto.subtle.importKey(
+      'pkcs8',
+      binaryDer,
+      {
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
+      },
+      false,
+      ['sign']
+    );
+  }
 }
 
-async function importPublicKey(publicKeyPem: string): Promise<CryptoKey> {
-  const pemHeader = '-----BEGIN PUBLIC KEY-----';
-  const pemFooter = '-----END PUBLIC KEY-----';
-  const pemContents = publicKeyPem
-    .replace(pemHeader, '')
-    .replace(pemFooter, '')
-    .replace(/\s/g, '');
-  
-  const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
-  
-  return await crypto.subtle.importKey(
-    'spki',
-    binaryDer,
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: 'SHA-256',
-    },
-    false,
-    ['verify']
-  );
+async function importPublicKey(publicKey: string): Promise<CryptoKey> {
+  // Handle JWK format (auto-generated keys) vs PEM format (user-provided)
+  if (publicKey.startsWith('{')) {
+    // JWK format - parse and import
+    const jwk = JSON.parse(publicKey);
+    return await crypto.subtle.importKey(
+      'jwk',
+      jwk,
+      {
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
+      },
+      false,
+      ['verify']
+    );
+  } else {
+    // PEM format - existing logic
+    const pemHeader = '-----BEGIN PUBLIC KEY-----';
+    const pemFooter = '-----END PUBLIC KEY-----';
+    const pemContents = publicKey
+      .replace(pemHeader, '')
+      .replace(pemFooter, '')
+      .replace(/\s/g, '');
+    
+    const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0));
+    
+    return await crypto.subtle.importKey(
+      'spki',
+      binaryDer,
+      {
+        name: 'RSASSA-PKCS1-v1_5',
+        hash: 'SHA-256',
+      },
+      false,
+      ['verify']
+    );
+  }
 }
 
 export async function generateKeyPair(): Promise<{ publicKey: string; privateKey: string }> {

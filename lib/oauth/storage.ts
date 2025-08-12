@@ -1,11 +1,17 @@
 import { OAuthClient, AuthorizationCode, AccessToken } from "../types.ts";
 import { getErrorMessage } from "../errorUtils.ts";
 
+// Global storage instances to persist across requests
+const globalClients: Map<string, OAuthClient> = new Map();
+const globalAuthorizationCodes: Map<string, AuthorizationCode> = new Map();
+const globalAccessTokens: Map<string, AccessToken> = new Map();
+const globalRefreshTokens: Map<string, AccessToken> = new Map();
+
 class OAuthMemoryStorage {
-  private clients: Map<string, OAuthClient> = new Map();
-  private authorizationCodes: Map<string, AuthorizationCode> = new Map();
-  private accessTokens: Map<string, AccessToken> = new Map();
-  private refreshTokens: Map<string, AccessToken> = new Map();
+  private clients = globalClients;
+  private authorizationCodes = globalAuthorizationCodes;
+  private accessTokens = globalAccessTokens;
+  private refreshTokens = globalRefreshTokens;
 
   async storeClient(client: OAuthClient): Promise<void> {
     this.clients.set(client.clientId, client);

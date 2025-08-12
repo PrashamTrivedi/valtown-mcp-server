@@ -63,16 +63,44 @@ export class AuthorizationFlowService {
         };
       }
 
-      // Validate client
-      const clientResult = await this.clientService.getClient(request.client_id);
+      // Validate client - with fallback auto-registration for Claude Desktop
+      let clientResult = await this.clientService.getClient(request.client_id);
       if (!clientResult.success || !clientResult.data) {
-        return {
-          success: false,
-          error: {
-            error: "invalid_client",
-            error_description: "Invalid client_id"
-          }
-        };
+        console.log(`Unknown client_id: ${request.client_id}, attempting auto-registration`);
+        
+        // Auto-register client for Claude Desktop and other MCP clients
+        const autoRegisterResult = await this.clientService.registerClient({
+          client_id: request.client_id,
+          redirect_uris: [request.redirect_uri],
+          grant_types: ["authorization_code", "refresh_token"],
+          response_types: ["code"],
+          token_endpoint_auth_method: "none", // Public client
+          scope: (request.scope && request.scope.trim()) ? request.scope : "read write"
+        });
+        
+        if (!autoRegisterResult.success) {
+          return {
+            success: false,
+            error: {
+              error: "invalid_client",
+              error_description: "Invalid client_id and auto-registration failed"
+            }
+          };
+        }
+        
+        // Try to get the client again
+        clientResult = await this.clientService.getClient(request.client_id);
+        if (!clientResult.success || !clientResult.data) {
+          return {
+            success: false,
+            error: {
+              error: "invalid_client", 
+              error_description: "Client auto-registration succeeded but client not found"
+            }
+          };
+        }
+        
+        console.log(`Auto-registered client: ${request.client_id}`);
       }
 
       const client = clientResult.data;
@@ -89,7 +117,7 @@ export class AuthorizationFlowService {
       }
 
       // Validate scope
-      const requestedScopes = request.scope?.split(" ") || ["read"];
+      const requestedScopes = request.scope && request.scope.trim() ? request.scope.split(" ") : ["read"];
       for (const scope of requestedScopes) {
         if (!client.scopes.includes(scope)) {
           return {

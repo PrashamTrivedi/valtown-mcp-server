@@ -4,6 +4,7 @@ import { OAuthStorage } from "./storage.ts";
 
 export interface ClientRegistrationRequest {
   redirect_uris: string[];
+  client_id?: string; // Allow custom client_id for auto-registration
   client_name?: string;
   client_uri?: string;
   logo_uri?: string;
@@ -74,7 +75,7 @@ export class ClientRegistrationService {
       }
 
       // Generate client credentials
-      const clientId = generateRandomString(32);
+      const clientId = request.client_id || generateRandomString(32);
       const tokenEndpointAuthMethod = request.token_endpoint_auth_method || "client_secret_basic";
       let clientSecret: string | undefined;
 
@@ -85,7 +86,7 @@ export class ClientRegistrationService {
       // Set default values
       const grantTypes = request.grant_types || ["authorization_code"];
       const responseTypes = request.response_types || ["code"];
-      const scopes = request.scope?.split(" ") || ["read"];
+      const scopes = request.scope && request.scope.trim() ? request.scope.split(" ") : ["read"];
 
       // Validate grant types
       const supportedGrantTypes = ["authorization_code", "refresh_token"];

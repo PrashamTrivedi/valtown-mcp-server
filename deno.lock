@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@std/path@*": "1.0.9",
     "npm:@modelcontextprotocol/sdk@*": "1.12.3_express@5.1.0_zod@3.25.64",
+    "npm:fetch-to-node@*": "2.1.0",
     "npm:hono@*": "4.7.11",
     "npm:zod@*": "3.25.64"
   },
@@ -198,6 +199,9 @@
     },
     "fast-json-stable-stringify@2.1.0": {
       "integrity": "sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw=="
+    },
+    "fetch-to-node@2.1.0": {
+      "integrity": "sha512-Wq05j6LE1GrWpT2t1YbCkyFY6xKRJq3hx/oRJdWEJpZlik3g25MmdJS6RFm49iiMJw6zpZuBOrgihOgy2jGyAA=="
     },
     "finalhandler@2.1.0": {
       "integrity": "sha512-/t88Ty3d5JWQbWYgaOGCCYfXRwV1+be02WqYYlL6h0lEiUAMPM8o8qKGO01YIkOHzka2up08wvgYD0mDiI+q3Q==",
